@@ -297,26 +297,57 @@ export const useUserStore = create<UserState>()(
       },
 
       // ✅ login
+      // login: async (input: LoginInputState) => {
+      //   set({ loading: true });
+
+      //   try {
+      //     const { data } = await axios.post(`${API_END_POINT}/login`, input, {
+      //       headers: { "Content-Type": "application/json" },
+      //       withCredentials: true,
+      //     });
+
+      //     if (data.success) {
+      //       toast.success(data.message);
+      //       set({
+      //         user: data.user,
+      //         isAuthenticated: true,
+      //         loading: false
+      //       });
+      //     } else {
+      //       set({ loading: false });
+      //     }
+      //   } catch (error: any) {
+      //     toast.error(error.response?.data?.message || "Login failed");
+      //     set({ loading: false });
+      //   }
+      // },
       login: async (input: LoginInputState) => {
+        console.log("🔄 Login started - setting loading: true");
         set({ loading: true });
 
         try {
+          console.log("📤 Sending login request to:", `${API_END_POINT}/login`);
           const { data } = await axios.post(`${API_END_POINT}/login`, input, {
             headers: { "Content-Type": "application/json" },
             withCredentials: true,
           });
 
+          console.log("✅ Login response received:", data);
+
           if (data.success) {
+            console.log("🎉 Login successful");
             toast.success(data.message);
             set({
               user: data.user,
               isAuthenticated: true,
-              loading: false
+              loading: false,
             });
           } else {
+            console.log("❌ Login failed - success false");
             set({ loading: false });
           }
         } catch (error: any) {
+          console.log("🔥 Login error:", error);
           toast.error(error.response?.data?.message || "Login failed");
           set({ loading: false });
         }
