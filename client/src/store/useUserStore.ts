@@ -311,12 +311,11 @@ export const useUserStore = create<UserState>()(
             set({
               user: data.user,
               isAuthenticated: true,
+              loading: false
             });
           }
         } catch (error: any) {
           toast.error(error.response?.data?.message || "Login failed");
-        } finally {
-          // ✅ ensure it ALWAYS stops loading
           set({ loading: false });
         }
       },

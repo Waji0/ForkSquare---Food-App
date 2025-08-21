@@ -17,7 +17,8 @@ const Login = () => {
     });
 
     const [errors, setErrors] = useState<Partial<LoginInputState>>({});
-    const {loading, login} = useUserStore();
+    // const {loading, login} = useUserStore();
+    const { loading, login, isCheckingAuth } = useUserStore();
     const navigate = useNavigate();
 
     const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +47,14 @@ const Login = () => {
             console.log(error);
         }
     };
+
+    if (isCheckingAuth) {
+      return (
+          <div className="flex items-center justify-center min-h-screen">
+              <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        );
+    }
 
     return (
     <div className="flex items-center justify-center text-center min-h-screen w-screen">

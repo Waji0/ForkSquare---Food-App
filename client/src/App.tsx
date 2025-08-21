@@ -285,7 +285,7 @@ const appRouter = createBrowserRouter([
       </ProtectedRoutes>
     ),
     children: [
-      { index: true, element: <HeroSection /> }, // ✅ cleaner than path:"/"
+      { index: true, element: <HeroSection /> },
       { path: "profile", element: <Profile /> },
       { path: "search/:text", element: <SearchPage /> },
       { path: "restaurant/:id", element: <RestaurantDetail /> },
