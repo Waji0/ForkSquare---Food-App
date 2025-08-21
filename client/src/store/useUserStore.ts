@@ -279,6 +279,7 @@ export const useUserStore = create<UserState>()(
           set({ loading: true });
           const { data } = await axios.post(`${API_END_POINT}/signup`, input, {
             headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           });
 
           if (data.success) {
@@ -297,10 +298,12 @@ export const useUserStore = create<UserState>()(
 
       // ✅ login
       login: async (input: LoginInputState) => {
+        set({ loading: true });
+
         try {
-          set({ loading: true });
           const { data } = await axios.post(`${API_END_POINT}/login`, input, {
             headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           });
 
           if (data.success) {
@@ -313,6 +316,7 @@ export const useUserStore = create<UserState>()(
         } catch (error: any) {
           toast.error(error.response?.data?.message || "Login failed");
         } finally {
+          // ✅ ensure it ALWAYS stops loading
           set({ loading: false });
         }
       },
@@ -324,7 +328,10 @@ export const useUserStore = create<UserState>()(
           const { data } = await axios.post(
             `${API_END_POINT}/verify-email`,
             { verificationCode },
-            { headers: { "Content-Type": "application/json" } }
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+            }
           );
 
           if (data.success) {
@@ -345,7 +352,9 @@ export const useUserStore = create<UserState>()(
       checkAuthentication: async () => {
         try {
           set({ isCheckingAuth: true });
-          const { data } = await axios.get(`${API_END_POINT}/check-auth`);
+          const { data } = await axios.get(`${API_END_POINT}/check-auth`, {
+            withCredentials: true,
+          });
 
           if (data.success) {
             set({
@@ -358,7 +367,6 @@ export const useUserStore = create<UserState>()(
         } catch {
           set({ user: null, isAuthenticated: false });
         } finally {
-          // ✅ always stop checking
           set({ isCheckingAuth: false });
         }
       },
@@ -367,7 +375,13 @@ export const useUserStore = create<UserState>()(
       logout: async () => {
         try {
           set({ loading: true });
-          const { data } = await axios.post(`${API_END_POINT}/logout`);
+          const { data } = await axios.post(
+            `${API_END_POINT}/logout`,
+            {},
+            {
+              withCredentials: true,
+            }
+          );
 
           if (data.success) {
             toast.success(data.message);
@@ -384,7 +398,13 @@ export const useUserStore = create<UserState>()(
       forgotPassword: async (email: string) => {
         try {
           set({ loading: true });
-          const { data } = await axios.post(`${API_END_POINT}/forgot-password`, { email });
+          const { data } = await axios.post(
+            `${API_END_POINT}/forgot-password`,
+            { email },
+            {
+              withCredentials: true,
+            }
+          );
 
           if (data.success) {
             toast.success(data.message);
@@ -402,7 +422,8 @@ export const useUserStore = create<UserState>()(
           set({ loading: true });
           const { data } = await axios.post(
             `${API_END_POINT}/reset-password/${token}`,
-            { newPassword }
+            { newPassword },
+            { withCredentials: true }
           );
 
           if (data.success) {
@@ -421,9 +442,14 @@ export const useUserStore = create<UserState>()(
       // ✅ update profile
       updateProfile: async (input: any) => {
         try {
-          const { data } = await axios.put(`${API_END_POINT}/profile/update`, input, {
-            headers: { "Content-Type": "application/json" },
-          });
+          const { data } = await axios.put(
+            `${API_END_POINT}/profile/update`,
+            input,
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+            }
+          );
 
           if (data.success) {
             toast.success(data.message);
@@ -440,4 +466,3 @@ export const useUserStore = create<UserState>()(
     }
   )
 );
-
