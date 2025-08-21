@@ -313,6 +313,8 @@ export const useUserStore = create<UserState>()(
               isAuthenticated: true,
               loading: false
             });
+          } else {
+            set({ loading: false });
           }
         } catch (error: any) {
           toast.error(error.response?.data?.message || "Login failed");
