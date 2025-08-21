@@ -24,7 +24,7 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
             });
 
             // clear Cart after Checkout // Self
-            console.log("Successfully Checkout now clearing cart");
+            // console.log("Successfully Checkout now clearing cart");
             useCartStore.getState().clearCart();
 
             window.location.href = response.data.session.url;
