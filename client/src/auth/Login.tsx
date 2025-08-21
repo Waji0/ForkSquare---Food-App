@@ -17,7 +17,9 @@ const Login = () => {
     });
 
     const [errors, setErrors] = useState<Partial<LoginInputState>>({});
-    const {loading, login} = useUserStore();
+    // const {loading, login} = useUserStore();
+    const [localLoading, setLocalLoading] = useState(false); // Local loading state
+    const { login, isCheckingAuth } = useUserStore();
     const navigate = useNavigate();
 
     const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -38,14 +40,21 @@ const Login = () => {
             return;
         }
 
+        setLocalLoading(true);
         // Login API implementation
         try {
             await login(input);
             navigate("/");
         } catch (error) {
             console.log(error);
+        } finally {
+            setLocalLoading(false); // Always reset local loading
         }
     };
+
+    if (isCheckingAuth) {
+      return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
 
     return (
     <div className="flex items-center justify-center text-center min-h-screen w-screen">
@@ -93,7 +102,7 @@ const Login = () => {
         </div>
 
         <div className="mb-10">
-          {loading ? (
+          {localLoading ? (
             <Button disabled className="w-full bg-orange hover:bg-hoverOrange">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
             </Button>
