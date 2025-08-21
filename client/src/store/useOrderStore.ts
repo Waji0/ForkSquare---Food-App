@@ -5,8 +5,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { useCartStore } from "./useCartStore";
 
 
-
-const API_END_POINT = "http://localhost:3000/api/v1/order";
+const API_END_POINT = "https://forksquare-server.vercel.app/api/v1/order";
+// const API_END_POINT = "http://localhost:3000/api/v1/order";
 axios.defaults.withCredentials = true;
 
 export const useOrderStore = create<OrderState>()(persist((set => ({

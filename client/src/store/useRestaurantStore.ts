@@ -7,8 +7,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 
 
-// const API_END_POINT = "https://food-app-yt.onrender.com/api/v1/restaurant";
-const API_END_POINT = "http://localhost:3000/api/v1/restaurant";
+const API_END_POINT = "https://forksquare-server.vercel.app/api/v1/restaurant";
+// const API_END_POINT = "http://localhost:3000/api/v1/restaurant";
 axios.defaults.withCredentials = true;
 
 

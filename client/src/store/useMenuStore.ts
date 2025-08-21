@@ -5,8 +5,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { useRestaurantStore } from "./useRestaurantStore";
 // import Loading from "@/components/Loading";
 
-// const API_END_POINT = "https://food-app-yt.onrender.com/api/v1/menu";
-const API_END_POINT = "http://localhost:3000/api/v1/menu";
+const API_END_POINT = "https://forksquare-server.vercel.app/api/v1/menu";
+// const API_END_POINT = "http://localhost:3000/api/v1/menu";
 axios.defaults.withCredentials = true;
 
 type MenuState = {
