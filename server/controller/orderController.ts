@@ -399,7 +399,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         }
 
         const order: any = new Order({
-            user: req.id, //req.user.id,
+            // user: req.id, 
+            user: req.user.id,
             restaurant: restaurantId,
             deliveryDetails,
             cartItems,
@@ -453,7 +454,8 @@ export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, 
                 currency: 'inr',
                 product_data: {
                     name: menuItem.name,
-                    images: [menuItem.image],
+                    // images: [menuItem.image],
+                    images: [menuItem.imageUrl],
                 },
                 unit_amount: menuItem.price * 100
             },
