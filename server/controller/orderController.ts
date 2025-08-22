@@ -161,102 +161,189 @@ export const getOrders = async (req: Request, res: Response) => {
 //     res.status(200).send();
 // };
 
+// export const createCheckoutSession = async (req: Request, res: Response) => {
+//     try {
+//         const checkoutSessionRequest: CheckoutSessionRequest = req.body;
+
+//         const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate('menus');
+
+//         if (!restaurant) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Restaurant not found."
+//             });
+//         }
+
+//         // ✅ Ensure cartItems always have image from restaurant.menus
+//         const enrichedCartItems = checkoutSessionRequest.cartItems.map(
+//           (cartItem: any) => {
+//             const menu = (restaurant.menus as any[]).find(
+//               (m: any) => m._id.toString() === cartItem.menuId
+//             );
+//             return {
+//               menuId: cartItem.menuId,
+//               name: cartItem.name,
+//               price: cartItem.price,
+//               quantity: cartItem.quantity,
+//               imageUrl: menu?.imageUrl || "", // ✅ match Order schema
+//             };
+//           }
+//         );
+
+
+//         const order: any = new Order({
+//             restaurant: restaurant._id,
+//             user: req.id,
+//             deliveryDetails: checkoutSessionRequest.deliveryDetails,
+//             cartItems: enrichedCartItems, // ✅ fixed
+//             status: "pending",
+//             totalAmount: checkoutSessionRequest.deliveryDetails.totalAmount,
+//         });
+
+//         // line items for Stripe
+//         const menuItems = restaurant.menus;
+//         const lineItems = createLineItems(checkoutSessionRequest, menuItems);
+
+//         const session = await stripe.checkout.sessions.create({
+//             payment_method_types: ["card"],
+//             shipping_address_collection: {
+//                 allowed_countries: ["GB", "US", "CA"],
+//             },
+//             line_items: lineItems,
+//             mode: "payment",
+//             success_url: `${process.env.FRONTEND_URL}/order/status`,
+//             cancel_url: `${process.env.FRONTEND_URL}/cart`,
+//             metadata: {
+//                 orderId: order._id.toString(),
+//                 images: JSON.stringify(menuItems.map((item: any) => item.imageUrl)),
+//             },
+//         });
+
+//         if (!session.url) {
+//             return res.status(400).json({ success: false, message: "Error while creating session" });
+//         }
+
+//         await order.save();
+
+//         return res.status(200).json({ session });
+
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({ message: "Internal server error" });
+//     }
+// };
 export const createCheckoutSession = async (req: Request, res: Response) => {
-    try {
-        const checkoutSessionRequest: CheckoutSessionRequest = req.body;
+  try {
+    const checkoutSessionRequest: CheckoutSessionRequest = req.body;
 
-        const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate('menus');
+    const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate('menus');
 
-        if (!restaurant) {
-            return res.status(404).json({
-                success: false,
-                message: "Restaurant not found."
-            });
-        }
-
-        // ✅ Ensure cartItems always have image from restaurant.menus
-        const enrichedCartItems = checkoutSessionRequest.cartItems.map(
-          (cartItem: any) => {
-            const menu = (restaurant.menus as any[]).find(
-              (m: any) => m._id.toString() === cartItem.menuId
-            );
-            return {
-              menuId: cartItem.menuId,
-              name: cartItem.name,
-              price: cartItem.price,
-              quantity: cartItem.quantity,
-              imageUrl: menu?.imageUrl || "", // ✅ match Order schema
-            };
-          }
-        );
-
-
-        const order: any = new Order({
-            restaurant: restaurant._id,
-            user: req.id,
-            deliveryDetails: checkoutSessionRequest.deliveryDetails,
-            cartItems: enrichedCartItems, // ✅ fixed
-            status: "pending",
-            totalAmount: checkoutSessionRequest.deliveryDetails.totalAmount,
-        });
-
-        // line items for Stripe
-        const menuItems = restaurant.menus;
-        const lineItems = createLineItems(checkoutSessionRequest, menuItems);
-
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            shipping_address_collection: {
-                allowed_countries: ["GB", "US", "CA"],
-            },
-            line_items: lineItems,
-            mode: "payment",
-            success_url: `${process.env.FRONTEND_URL}/order/status`,
-            cancel_url: `${process.env.FRONTEND_URL}/cart`,
-            metadata: {
-                orderId: order._id.toString(),
-                images: JSON.stringify(menuItems.map((item: any) => item.imageUrl)),
-            },
-        });
-
-        if (!session.url) {
-            return res.status(400).json({ success: false, message: "Error while creating session" });
-        }
-
-        await order.save();
-
-        return res.status(200).json({ session });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        message: "Restaurant not found."
+      });
     }
+
+    // Enrich cart items with imageUrl from restaurant.menus
+    const enrichedCartItems = checkoutSessionRequest.cartItems.map((cartItem: any) => {
+      const menu = (restaurant.menus as any[]).find(
+        (m: any) => m._id.toString() === cartItem.menuId.toString()
+      );
+
+      return {
+        menuId: cartItem.menuId,
+        name: cartItem.name,
+        price: cartItem.price,
+        quantity: cartItem.quantity,
+        imageUrl: menu?.imageUrl || "", // fallback if menu not found
+      };
+    }).filter(item => item.imageUrl || item.price > 0); // Remove invalid items
+
+    if (enrichedCartItems.length === 0) {
+      return res.status(400).json({ success: false, message: "No valid menu items in cart." });
+    }
+
+    const order: any = new Order({
+      restaurant: restaurant._id,
+      user: req.id,
+      deliveryDetails: checkoutSessionRequest.deliveryDetails,
+      cartItems: enrichedCartItems,
+      status: "pending",
+      totalAmount: checkoutSessionRequest.deliveryDetails.totalAmount,
+    });
+
+    // Generate Stripe line items safely
+    const lineItems = createLineItems(enrichedCartItems);
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      shipping_address_collection: { allowed_countries: ["GB", "US", "CA"] },
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `${process.env.FRONTEND_URL}/order/status`,
+      cancel_url: `${process.env.FRONTEND_URL}/cart`,
+      metadata: {
+        orderId: order._id.toString(),
+        images: JSON.stringify(enrichedCartItems.map(item => item.imageUrl)),
+      },
+    });
+
+    if (!session.url) {
+      return res.status(400).json({ success: false, message: "Error while creating session" });
+    }
+
+    await order.save();
+
+    return res.status(200).json({ session });
+
+  } catch (error) {
+    console.error("Checkout error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 
 
-export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, menuItems: any) => {
+// export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, menuItems: any) => {
 
-    // 1. create line items
-    const lineItems = checkoutSessionRequest.cartItems.map((cartItem) => {
-        const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
-        if (!menuItem) throw new Error(`Menu item id not found`);
+//     // 1. create line items
+//     const lineItems = checkoutSessionRequest.cartItems.map((cartItem) => {
+//         const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
+//         if (!menuItem) throw new Error(`Menu item id not found`);
 
-        return {
+//         return {
 
-            price_data: {
-                currency: 'inr',
-                product_data: {
-                    name: menuItem.name,
-                    images: [menuItem.image],
-                },
-                unit_amount: menuItem.price * 100
-            },
+//             price_data: {
+//                 currency: 'inr',
+//                 product_data: {
+//                     name: menuItem.name,
+//                     images: [menuItem.image],
+//                 },
+//                 unit_amount: menuItem.price * 100
+//             },
 
-            quantity: cartItem.quantity,
-        };
-    });
+//             quantity: cartItem.quantity,
+//         };
+//     });
 
-    // 2. return lineItems
-    return lineItems;
+//     // 2. return lineItems
+//     return lineItems;
+// };
+
+export const createLineItems = (cartItems: any[]) => {
+  // Only include valid items
+  return cartItems
+    .filter(item => item.price > 0 && item.name) // skip invalid items
+    .map(item => ({
+      price_data: {
+        currency: "inr",
+        product_data: {
+          name: item.name,
+          images: [item.imageUrl || ""],
+        },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.quantity,
+    }));
 };
