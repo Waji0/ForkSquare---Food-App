@@ -2,7 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRestaurantStore } from "@/store/useRestaurantStore";
 import { useEffect } from "react";
-
+import type { Orders as Order } from "../types/orderType";
 
 
 const Orders = () => {
@@ -27,7 +27,7 @@ const Orders = () => {
       <div className="space-y-8">
 
         {/* Restaurant Orders diplay here  */}
-        {restaurantOrder.map((order) => (
+        {restaurantOrder.map((order: Order) => (
           <div key={order._id} className="flex flex-col md:flex-row justify-between items-start sm:items-center bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
             <div className="flex-1 mb-6 sm:mb-0">
               <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">

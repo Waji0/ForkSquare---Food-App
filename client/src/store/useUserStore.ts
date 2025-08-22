@@ -221,11 +221,10 @@
 // );
 
 
-
-
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axios from "axios";
+import type { LoginInputState, SignupInputState } from "../Schema/userSchema";
 import { toast } from "sonner";
 
 axios.defaults.withCredentials = true;
@@ -248,10 +247,14 @@ type UserState = {
   isAuthenticated: boolean;
   isCheckingAuth: boolean;
   loading: boolean;
-  signup: (input: any) => Promise<void>;
-  login: (input: any) => Promise<void>;
+  signup: (input: SignupInputState) => Promise<void>;
+  login: (input: LoginInputState) => Promise<void>;
+  verifyEmail: (verificationCode: string) => Promise<void>;
   checkAuthentication: () => Promise<void>;
   logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (token: string, newPassword: string) => Promise<boolean>;
+  updateProfile: (input: any) => Promise<void>;
 };
 
 export const useUserStore = create<UserState>()(
@@ -262,30 +265,52 @@ export const useUserStore = create<UserState>()(
       isCheckingAuth: true,
       loading: false,
 
-      signup: async (input) => {
+      signup: async (input: SignupInputState) => {
         try {
           set({ loading: true });
-          const { data } = await axios.post("/user/signup", input);
+          const { data } = await axios.post("/user/signup", input, {
+            headers: { "Content-Type": "application/json" },
+          });
           if (data.success) {
             toast.success(data.message);
             set({ user: data.user, isAuthenticated: true, loading: false });
           }
-        } catch (err: any) {
-          toast.error(err.response?.data?.message || "Signup failed");
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Signup failed");
           set({ loading: false });
         }
       },
 
-      login: async (input) => {
+      login: async (input: LoginInputState) => {
         try {
           set({ loading: true });
-          const { data } = await axios.post("/user/login", input);
+          const { data } = await axios.post("/user/login", input, {
+            headers: { "Content-Type": "application/json" },
+          });
           if (data.success) {
             toast.success(data.message);
             set({ user: data.user, isAuthenticated: true, loading: false });
           }
-        } catch (err: any) {
-          toast.error(err.response?.data?.message || "Login failed");
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Login failed");
+          set({ loading: false });
+        }
+      },
+
+      verifyEmail: async (verificationCode: string) => {
+        try {
+          set({ loading: true });
+          const { data } = await axios.post(
+            "/user/verify-email",
+            { verificationCode },
+            { headers: { "Content-Type": "application/json" } }
+          );
+          if (data.success) {
+            toast.success(data.message);
+            set({ user: data.user, isAuthenticated: true, loading: false });
+          }
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Email verification failed");
           set({ loading: false });
         }
       },
@@ -306,15 +331,63 @@ export const useUserStore = create<UserState>()(
 
       logout: async () => {
         try {
+          set({ loading: true });
           const { data } = await axios.post("/user/logout");
           if (data.success) {
             toast.success(data.message);
-            set({ user: null, isAuthenticated: false });
+            set({ user: null, isAuthenticated: false, loading: false });
           }
-        } catch (err: any) {
-          toast.error(err.response?.data?.message || "Logout failed");
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Logout failed");
+          set({ loading: false });
         }
       },
+
+      forgotPassword: async (email: string) => {
+        try {
+          set({ loading: true });
+          const { data } = await axios.post("/user/forgot-password", { email });
+          if (data.success) {
+            toast.success(data.message);
+          }
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Forgot password failed");
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      resetPassword: async (token: string, newPassword: string) => {
+        try {
+          set({ loading: true });
+          const { data } = await axios.post(`/user/reset-password/${token}`, { newPassword });
+          if (data.success) {
+            toast.success(data.message);
+            return true;
+          }
+          return false;
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Reset password failed");
+          return false;
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      updateProfile: async (input: any) => {
+        try {
+          const { data } = await axios.put("/user/profile/update", input, {
+            headers: { "Content-Type": "application/json" },
+          });
+          if (data.success) {
+            toast.success(data.message);
+            set({ user: data.user, isAuthenticated: true });
+          }
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Profile update failed");
+        }
+      },
+      
     }),
     {
       name: "user-store",
