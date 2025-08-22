@@ -30,7 +30,7 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     });
 
     const { cart } = useCartStore();
-    const { restaurant, getRestaurant } = useRestaurantStore();
+    const { restaurant } = useRestaurantStore();
     const { createCheckoutSession, loading } = useOrderStore();
 
     const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +40,6 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
 
     const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        getRestaurant();
 
         // API Implementation
         try {

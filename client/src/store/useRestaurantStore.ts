@@ -602,8 +602,13 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
           const { data } = await axios.get(
             `/restaurant/search/${searchText}?${params.toString()}`
           );
-          if (data.success) set({ searchedRestaurant: { data: data.data } });
-          else set({ searchedRestaurant: { data: [] } });
+          
+          if (data.success) {
+            set({ searchedRestaurant: { data: data.data } });
+          } else {
+             set({ searchedRestaurant: { data: [] } });
+          }
+
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Search failed");
           set({ searchedRestaurant: { data: [] } });
