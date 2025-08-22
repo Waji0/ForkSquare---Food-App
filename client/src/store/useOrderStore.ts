@@ -232,8 +232,10 @@ export const useOrderStore = create<OrderState>()(
             .map((item) => ({
               menuId: item.menuId,
               name: item.name,
-              price: item.price,
-              quantity: item.quantity,
+            //   price: item.price,
+            //   quantity: item.quantity,
+                price: Number(item.price),   
+                quantity: Number(item.quantity),
               image: item.image || "https://example.com/placeholder.png", // fallback
             }));
 
