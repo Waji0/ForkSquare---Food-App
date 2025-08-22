@@ -49,8 +49,9 @@ const Cart = () => {
               </TableCell>
               <TableCell> {item.name}</TableCell>
               <TableCell> {item.price}</TableCell>
-              <TableCell>
-                <div className="w-fit flex items-center rounded-full border border-gray-100 dark:border-gray-800 shadow-md">
+              <TableCell> 
+                {/* // border border-gray-100 dark:border-gray-800 */}
+                <div className="w-fit flex items-center rounded-full border border-none shadow-md">
                   <Button
                   onClick={() => decrementQuantity(item._id)}
                     size={"icon"}
