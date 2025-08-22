@@ -443,7 +443,9 @@ export const useRestaurantStore = create<any>()(
           const params = new URLSearchParams();
           params.set("searchQuery", searchQuery);
           params.set("selectedCuisines", selectedCuisines.join(","));
-          const { data } = await axios.get(`/restaurant/search/${searchText}?${params.toString()}`);
+          const { data } = await axios.get(`/restaurant/search/${searchText}?${params.toString()}`, {
+             withCredentials: true,
+           });
           if (data.success) set({ searchedRestaurant: data.data });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Search failed");

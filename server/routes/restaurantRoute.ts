@@ -11,7 +11,7 @@ router.route("/").put(isAuthenticated, upload.single("imageFile"), updateRestaur
 router.route("/").delete(isAuthenticated, deleteRestaurant);
 router.route("/order").get(isAuthenticated,  getRestaurantOrder);
 router.route("/order/:orderId/status").put(isAuthenticated, updateOrderStatus);
-// router.route("/search/:searchText").get(isAuthenticated, searchRestaurant);
+router.route("/search/:searchText").get(isAuthenticated, searchRestaurant);
 // router.get("/search/:searchText", isAuthenticated, searchRestaurant);
 router.route("/:id").get(isAuthenticated, getSingleRestaurant);
 
