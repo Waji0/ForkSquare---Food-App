@@ -208,121 +208,215 @@
 
 
 
-import Login from "./auth/Login";
+// import Login from "./auth/Login";
+// import { createBrowserRouter, RouterProvider } from "react-router-dom";
+// import Signup from "./auth/Signup";
+// import ForgotPassword from "./auth/ForgotPassword";
+// import ResetPassword from "./auth/ResetPassword";
+// import VerifyEmail from "./auth/VerifyEmail";
+// import HeroSection from "./components/HeroSection";
+// import MainLayout from "./layout/MainLayout";
+// import Profile from "./components/Profile";
+// import SearchPage from "./components/SearchPage";
+// import RestaurantDetail from "./components/RestaurantDetail";
+// import Cart from "./components/Cart";
+// import Restaurant from "./admin/Restaurant";
+// import AddMenu from "./admin/AddMenu";
+// import Orders from "./admin/Orders";
+// import SuccessOrder from "./components/SuccessOrder";
+// import { useUserStore } from "./store/useUserStore";
+// import { Navigate } from "react-router-dom";
+// import { useEffect } from "react";
+// import Loading from "./components/Loading";
+
+// import NotFound from "./components/NotFound";
+// import AboutUs from "./components/AboutUs";
+// import Services from "./components/Services";
+// import Contact from "./components/Contact";
+// import PrivacyPolicy from "./components/PrivacyPolicy";
+
+// // ✅ Protected routes wrapper
+// const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
+//   const { isAuthenticated, user, isCheckingAuth } = useUserStore();
+
+//   if (isCheckingAuth) return <Loading />;
+
+//   if (!isAuthenticated) return <Navigate to="/login" replace />;
+//   if (!user?.isVerified) return <Navigate to="/verify-email" replace />;
+
+//   return children;
+// };
+
+// // ✅ Prevents logged-in users from accessing login/signup/forgot
+// const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
+//   const { isAuthenticated, user, isCheckingAuth } = useUserStore();
+
+//   if (isCheckingAuth) return <Loading />;
+
+//   if (isAuthenticated && !user?.isVerified) {
+//     return <Navigate to="/verify-email" replace />;
+//   }
+//   if (isAuthenticated && user?.isVerified) {
+//     return <Navigate to="/" replace />;
+//   }
+
+//   return children;
+// };
+
+// // ✅ Admin-only routes
+// const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+//   const { user, isAuthenticated, isCheckingAuth } = useUserStore();
+
+//   if (isCheckingAuth) return <Loading />;
+
+//   if (!isAuthenticated) return <Navigate to="/login" replace />;
+//   if (!user?.admin) return <Navigate to="/" replace />;
+
+//   return children;
+// };
+
+// // ✅ Router config
+// const appRouter = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: (
+//       <ProtectedRoutes>
+//         <MainLayout />
+//       </ProtectedRoutes>
+//     ),
+//     children: [
+//       { index: true, element: <HeroSection /> },
+//       { path: "profile", element: <Profile /> },
+//       { path: "search/:text", element: <SearchPage /> },
+//       { path: "restaurant/:id", element: <RestaurantDetail /> },
+//       { path: "cart", element: <Cart /> },
+//       { path: "order/status", element: <SuccessOrder /> },
+//       { path: "about", element: <AboutUs /> },
+//       { path: "services", element: <Services /> },
+//       { path: "contact", element: <Contact /> },
+//       { path: "privacy-policy", element: <PrivacyPolicy /> },
+//       // ✅ Admin
+//       { path: "admin/restaurant", element: <AdminRoute><Restaurant /></AdminRoute> },
+//       { path: "admin/menu", element: <AdminRoute><AddMenu /></AdminRoute> },
+//       { path: "admin/orders", element: <AdminRoute><Orders /></AdminRoute> },
+//     ],
+//   },
+//   // ✅ Auth + misc routes
+//   { path: "/login", element: <AuthenticatedUser><Login /></AuthenticatedUser> },
+//   { path: "/signup", element: <AuthenticatedUser><Signup /></AuthenticatedUser> },
+//   { path: "/forgot-password", element: <AuthenticatedUser><ForgotPassword /></AuthenticatedUser> },
+//   { path: "/reset-password/:resetToken", element: <ResetPassword /> },
+//   { path: "/verify-email", element: <VerifyEmail /> },
+//   { path: "*", element: <NotFound /> },
+// ]);
+
+// function App() {
+//   const { checkAuthentication } = useUserStore();
+
+//   // ✅ check auth on page load
+//   useEffect(() => {
+//     checkAuthentication();
+//   }, [checkAuthentication]);
+
+//   return (
+//     <main>
+//       <RouterProvider router={appRouter} />
+//     </main>
+//   );
+// }
+
+// export default App;
+
+
+
+
+
+
+
+import { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Signup from "./auth/Signup";
-import ForgotPassword from "./auth/ForgotPassword";
-import ResetPassword from "./auth/ResetPassword";
-import VerifyEmail from "./auth/VerifyEmail";
-import HeroSection from "./components/HeroSection";
+
+import { useUserStore } from "./store/useUserStore";
+
+import ProtectedRoutes from "./routes/ProtectedRoutes";
+import AuthenticatedUser from "./routes/AuthenticatedUser";
+import AdminRoute from "./routes/AdminRoute";
+
 import MainLayout from "./layout/MainLayout";
+import HeroSection from "./components/HeroSection";
 import Profile from "./components/Profile";
 import SearchPage from "./components/SearchPage";
 import RestaurantDetail from "./components/RestaurantDetail";
 import Cart from "./components/Cart";
+import SuccessOrder from "./components/SuccessOrder";
+
 import Restaurant from "./admin/Restaurant";
 import AddMenu from "./admin/AddMenu";
 import Orders from "./admin/Orders";
-import SuccessOrder from "./components/SuccessOrder";
-import { useUserStore } from "./store/useUserStore";
-import { Navigate } from "react-router-dom";
-import { useEffect } from "react";
-import Loading from "./components/Loading";
+
+import Login from "./auth/Login";
+import Signup from "./auth/Signup";
+import ForgotPassword from "./auth/ForgotPassword";
+import ResetPassword from "./auth/ResetPassword";
+import VerifyEmail from "./auth/VerifyEmail";
 
 import NotFound from "./components/NotFound";
+import Loading from "./components/Loading";
 import AboutUs from "./components/AboutUs";
 import Services from "./components/Services";
 import Contact from "./components/Contact";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 
-// ✅ Protected routes wrapper
-const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user, isCheckingAuth } = useUserStore();
-
-  if (isCheckingAuth) return <Loading />;
-
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!user?.isVerified) return <Navigate to="/verify-email" replace />;
-
-  return children;
-};
-
-// ✅ Prevents logged-in users from accessing login/signup/forgot
-const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user, isCheckingAuth } = useUserStore();
-
-  if (isCheckingAuth) return <Loading />;
-
-  if (isAuthenticated && !user?.isVerified) {
-    return <Navigate to="/verify-email" replace />;
-  }
-  if (isAuthenticated && user?.isVerified) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
-
-// ✅ Admin-only routes
-const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAuthenticated, isCheckingAuth } = useUserStore();
-
-  if (isCheckingAuth) return <Loading />;
-
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!user?.admin) return <Navigate to="/" replace />;
-
-  return children;
-};
-
-// ✅ Router config
-const appRouter = createBrowserRouter([
-  {
-    path: "/",
-    element: (
-      <ProtectedRoutes>
-        <MainLayout />
-      </ProtectedRoutes>
-    ),
-    children: [
-      { index: true, element: <HeroSection /> },
-      { path: "profile", element: <Profile /> },
-      { path: "search/:text", element: <SearchPage /> },
-      { path: "restaurant/:id", element: <RestaurantDetail /> },
-      { path: "cart", element: <Cart /> },
-      { path: "order/status", element: <SuccessOrder /> },
-      { path: "about", element: <AboutUs /> },
-      { path: "services", element: <Services /> },
-      { path: "contact", element: <Contact /> },
-      { path: "privacy-policy", element: <PrivacyPolicy /> },
-      // ✅ Admin
-      { path: "admin/restaurant", element: <AdminRoute><Restaurant /></AdminRoute> },
-      { path: "admin/menu", element: <AdminRoute><AddMenu /></AdminRoute> },
-      { path: "admin/orders", element: <AdminRoute><Orders /></AdminRoute> },
-    ],
-  },
-  // ✅ Auth + misc routes
-  { path: "/login", element: <AuthenticatedUser><Login /></AuthenticatedUser> },
-  { path: "/signup", element: <AuthenticatedUser><Signup /></AuthenticatedUser> },
-  { path: "/forgot-password", element: <AuthenticatedUser><ForgotPassword /></AuthenticatedUser> },
-  { path: "/reset-password/:resetToken", element: <ResetPassword /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
-  { path: "*", element: <NotFound /> },
-]);
-
 function App() {
-  const { checkAuthentication } = useUserStore();
+  const { checkAuthentication, isCheckingAuth } = useUserStore();
 
-  // ✅ check auth on page load
+  // Check auth on page load
   useEffect(() => {
     checkAuthentication();
   }, [checkAuthentication]);
 
-  return (
-    <main>
-      <RouterProvider router={appRouter} />
-    </main>
-  );
+  if (isCheckingAuth) return <Loading />;
+
+  // ✅ Router config
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <ProtectedRoutes>
+          <MainLayout />
+        </ProtectedRoutes>
+      ),
+      children: [
+        { index: true, element: <HeroSection /> },
+        { path: "profile", element: <Profile /> },
+        { path: "search/:text", element: <SearchPage /> },
+        { path: "restaurant/:id", element: <RestaurantDetail /> },
+        { path: "cart", element: <Cart /> },
+        { path: "order/status", element: <SuccessOrder /> },
+        { path: "about", element: <AboutUs /> },
+        { path: "services", element: <Services /> },
+        { path: "contact", element: <Contact /> },
+        { path: "privacy-policy", element: <PrivacyPolicy /> },
+
+        // ✅ Admin routes
+        { path: "admin/restaurant", element: <AdminRoute><Restaurant /></AdminRoute> },
+        { path: "admin/menu", element: <AdminRoute><AddMenu /></AdminRoute> },
+        { path: "admin/orders", element: <AdminRoute><Orders /></AdminRoute> },
+      ],
+    },
+
+    // ✅ Auth routes (login/signup/forgot)
+    { path: "/login", element: <AuthenticatedUser><Login /></AuthenticatedUser> },
+    { path: "/signup", element: <AuthenticatedUser><Signup /></AuthenticatedUser> },
+    { path: "/forgot-password", element: <AuthenticatedUser><ForgotPassword /></AuthenticatedUser> },
+    { path: "/reset-password/:resetToken", element: <ResetPassword /> },
+    { path: "/verify-email", element: <VerifyEmail /> },
+
+    // 404 fallback
+    { path: "*", element: <NotFound /> },
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
 export default App;
