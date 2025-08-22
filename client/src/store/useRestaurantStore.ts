@@ -267,17 +267,35 @@
 // import { createJSONStorage, persist } from "zustand/middleware";
 // import axios from "axios";
 // import { toast } from "sonner";
+// import { useUserStore } from "./useUserStore";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.baseURL = "https://forksquare-server.vercel.app/api/v1";
 
 // export const useRestaurantStore = create<any>()(
 //   persist(
-//     (set, _ ) => ({
+//     (set, get) => ({
 //       loading: false,
 //       restaurant: null,
+//       searchedRestaurant: null,
+//       appliedFilter: [],
+//       singleRestaurant: null,
+//       restaurantOrder: [],
 
+//       // ---------------- Authentication Guard ----------------
+//       ensureAuthenticated: async () => {
+//         const userState = useUserStore.getState();
+//         if (!userState.isAuthenticated) {
+//           await userState.checkAuthentication();
+//         }
+//         if (!useUserStore.getState().isAuthenticated) {
+//           throw new Error("User not authenticated");
+//         }
+//       },
+
+//       // ---------------- Restaurant CRUD ----------------
 //       createRestaurant: async (formData: FormData) => {
+//         await get().ensureAuthenticated();
 //         try {
 //           set({ loading: true });
 //           const { data } = await axios.post("/restaurant/", formData, {
@@ -285,27 +303,28 @@
 //             withCredentials: true,
 //           });
 //           if (data.success) toast.success(data.message);
-//           set({ loading: false });
 //         } catch (err: any) {
 //           toast.error(err.response?.data?.message || "Failed to create restaurant");
+//         } finally {
 //           set({ loading: false });
 //         }
 //       },
 
 //       getRestaurant: async () => {
+//         await get().ensureAuthenticated();
 //         try {
 //           set({ loading: true });
-//           const { data } = await axios.get("/restaurant/", {
-//              withCredentials: true,
-//            });
-//           if (data.success) set({ restaurant: data.restaurant, loading: false });
+//           const { data } = await axios.get("/restaurant/", { withCredentials: true });
+//           if (data.success) set({ restaurant: data.restaurant });
 //         } catch (err: any) {
 //           toast.error(err.response?.data?.message || "Failed to fetch restaurant");
+//         } finally {
 //           set({ loading: false });
 //         }
 //       },
 
 //       updateRestaurant: async (formData: FormData) => {
+//         await get().ensureAuthenticated();
 //         try {
 //           set({ loading: true });
 //           const { data } = await axios.put("/restaurant/", formData, {
@@ -313,25 +332,128 @@
 //             withCredentials: true,
 //           });
 //           if (data.success) toast.success(data.message || "Restaurant updated!");
-//           set({ loading: false });
 //         } catch (err: any) {
 //           toast.error(err.response?.data?.message || "Update failed");
+//         } finally {
 //           set({ loading: false });
 //         }
 //       },
 
 //       deleteRestaurant: async () => {
+//         await get().ensureAuthenticated();
 //         try {
-//           const { data } = await axios.delete("/restaurant/", {
-//              withCredentials: true,
-//            });
+//           const { data } = await axios.delete("/restaurant/", { withCredentials: true });
 //           if (data.success) toast.success(data.message || "Restaurant deleted");
-//           set({ restaurant: null });
+//           set({ restaurant: null, restaurantOrder: [], singleRestaurant: null });
 //         } catch (err: any) {
 //           toast.error(err.response?.data?.message || "Delete failed");
 //         }
 //       },
 
+//       // ---------------- Restaurant Search ----------------
+//       searchRestaurant: async (searchText: string, searchQuery: string, selectedCuisines: string[]) => {
+//         await get().ensureAuthenticated();
+//         try {
+//           set({ loading: true });
+//           const params = new URLSearchParams();
+//           params.set("searchQuery", searchQuery);
+//           params.set("selectedCuisines", selectedCuisines.join(","));
+//           const { data } = await axios.get(`/restaurant/search/${searchText}?${params.toString()}`, {
+//              withCredentials: true,
+//            });
+//           // if (data.success) set({ searchedRestaurant: data.data });
+//           if (data.success) set({ searchedRestaurant: { data: data.data } });
+//         } catch (err: any) {
+//           toast.error(err.response?.data?.message || "Search failed");
+//         } finally {
+//           set({ loading: false });
+//         }
+//       },
+
+//       getSingleRestaurant: async (restaurantId: string) => {
+//         await get().ensureAuthenticated();
+//         try {
+//           const { data } = await axios.get(`/restaurant/${restaurantId}`, { withCredentials: true });
+//           if (data.success) set({ singleRestaurant: data.restaurant });
+//         } catch (err: any) {
+//           toast.error(err.response?.data?.message || "Failed to fetch restaurant");
+//         }
+//       },
+
+//       // ---------------- Orders ----------------
+//       getRestaurantOrders: async () => {
+//         await get().ensureAuthenticated();
+//         try {
+//           const { data } = await axios.get("/restaurant/order", { withCredentials: true });
+//           if (data.success) set({ restaurantOrder: data.orders });
+//         } catch (err: any) {
+//           toast.error(err.response?.data?.message || "Failed to fetch orders");
+//         }
+//       },
+
+//       updateRestaurantOrder: async (orderId: string, status: string) => {
+//         await get().ensureAuthenticated();
+//         try {
+//           const { data } = await axios.put(`/restaurant/order/${orderId}/status`, { status });
+//           if (data.success) {
+//             const updatedOrder = get().restaurantOrder.map((order: any) =>
+//               order._id === orderId ? { ...order, status: data.status } : order
+//             );
+//             set({ restaurantOrder: updatedOrder });
+//             toast.success(data.message);
+//           }
+//         } catch (err: any) {
+//           toast.error(err.response?.data?.message || "Failed to update order");
+//         }
+//       },
+
+//       // ---------------- Menu Management ----------------
+//       addMenuToRestaurant: (menu: any) => {
+//         set((state: any) => ({
+//           restaurant: state.restaurant
+//             ? { ...state.restaurant, menus: [...state.restaurant.menus, menu] }
+//             : null,
+//         }));
+//       },
+
+//       updateMenuToRestaurant: (updatedMenu: any) => {
+//         set((state: any) => {
+//           if (state.restaurant) {
+//             const updatedMenuList = state.restaurant.menus.map((menu: any) =>
+//               menu._id === updatedMenu._id ? updatedMenu : menu
+//             );
+//             return { restaurant: { ...state.restaurant, menus: updatedMenuList } };
+//           }
+//           return state;
+//         });
+//       },
+
+//       removeMenuFromRestaurant: (menuId: string) => {
+//         set((state: any) => {
+//           if (state.restaurant) {
+//             return {
+//               restaurant: {
+//                 ...state.restaurant,
+//                 menus: state.restaurant.menus.filter((menu: any) => menu._id !== menuId),
+//               },
+//             };
+//           }
+//           return state;
+//         });
+//       },
+
+//       // ---------------- Filters ----------------
+//       setAppliedFilter: (value: string) => {
+//         set((state: any) => {
+//           const isAlreadyApplied = state.appliedFilter.includes(value);
+//           const updatedFilter = isAlreadyApplied
+//             ? state.appliedFilter.filter((item: string) => item !== value)
+//             : [...state.appliedFilter, value];
+//           return { appliedFilter: updatedFilter };
+//         });
+//       },
+
+//       resetAppliedFilter: () => set({ appliedFilter: [] }),
 //     }),
 //     {
 //       name: "restaurant-store",
@@ -346,28 +468,66 @@
 
 
 
-
-
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axios from "axios";
 import { toast } from "sonner";
 import { useUserStore } from "./useUserStore";
+import type { Restaurant, MenuItem } from "../types/restaurantType";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "https://forksquare-server.vercel.app/api/v1";
 
-export const useRestaurantStore = create<any>()(
+// Define types for state
+interface RestaurantStoreState {
+  loading: boolean;
+  restaurant: Restaurant | null;
+  searchedRestaurant: { data: Restaurant[] };
+  appliedFilter: string[];
+  singleRestaurant: Restaurant | null;
+  restaurantOrder: any[]; // You can refine this with a proper Order type
+
+  // CRUD actions
+  createRestaurant: (formData: FormData) => Promise<void>;
+  getRestaurant: () => Promise<void>;
+  updateRestaurant: (formData: FormData) => Promise<void>;
+  deleteRestaurant: () => Promise<void>;
+
+  searchRestaurant: (
+    searchText: string,
+    searchQuery: string,
+    selectedCuisines: string[]
+  ) => Promise<void>;
+
+  getSingleRestaurant: (restaurantId: string) => Promise<void>;
+
+  // Orders
+  getRestaurantOrders: () => Promise<void>;
+  updateRestaurantOrder: (orderId: string, status: string) => Promise<void>;
+
+  // Menu management
+  addMenuToRestaurant: (menu: MenuItem) => void;
+  updateMenuToRestaurant: (menu: MenuItem) => void;
+  removeMenuFromRestaurant: (menuId: string) => void;
+
+  // Filters
+  setAppliedFilter: (value: string) => void;
+  resetAppliedFilter: () => void;
+
+  // Auth guard
+  ensureAuthenticated: () => Promise<void>;
+}
+
+export const useRestaurantStore = create<RestaurantStoreState>()(
   persist(
     (set, get) => ({
       loading: false,
       restaurant: null,
-      searchedRestaurant: null,
+      searchedRestaurant: { data: [] },
       appliedFilter: [],
       singleRestaurant: null,
       restaurantOrder: [],
 
-      // ---------------- Authentication Guard ----------------
       ensureAuthenticated: async () => {
         const userState = useUserStore.getState();
         if (!userState.isAuthenticated) {
@@ -378,14 +538,12 @@ export const useRestaurantStore = create<any>()(
         }
       },
 
-      // ---------------- Restaurant CRUD ----------------
       createRestaurant: async (formData: FormData) => {
         await get().ensureAuthenticated();
         try {
           set({ loading: true });
           const { data } = await axios.post("/restaurant/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
-            withCredentials: true,
           });
           if (data.success) toast.success(data.message);
         } catch (err: any) {
@@ -399,7 +557,7 @@ export const useRestaurantStore = create<any>()(
         await get().ensureAuthenticated();
         try {
           set({ loading: true });
-          const { data } = await axios.get("/restaurant/", { withCredentials: true });
+          const { data } = await axios.get("/restaurant/");
           if (data.success) set({ restaurant: data.restaurant });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Failed to fetch restaurant");
@@ -414,7 +572,6 @@ export const useRestaurantStore = create<any>()(
           set({ loading: true });
           const { data } = await axios.put("/restaurant/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
-            withCredentials: true,
           });
           if (data.success) toast.success(data.message || "Restaurant updated!");
         } catch (err: any) {
@@ -427,7 +584,7 @@ export const useRestaurantStore = create<any>()(
       deleteRestaurant: async () => {
         await get().ensureAuthenticated();
         try {
-          const { data } = await axios.delete("/restaurant/", { withCredentials: true });
+          const { data } = await axios.delete("/restaurant/");
           if (data.success) toast.success(data.message || "Restaurant deleted");
           set({ restaurant: null, restaurantOrder: [], singleRestaurant: null });
         } catch (err: any) {
@@ -435,52 +592,52 @@ export const useRestaurantStore = create<any>()(
         }
       },
 
-      // ---------------- Restaurant Search ----------------
-      searchRestaurant: async (searchText: string, searchQuery: string, selectedCuisines: string[]) => {
+      searchRestaurant: async (searchText, searchQuery, selectedCuisines) => {
         await get().ensureAuthenticated();
         try {
           set({ loading: true });
           const params = new URLSearchParams();
           params.set("searchQuery", searchQuery);
           params.set("selectedCuisines", selectedCuisines.join(","));
-          const { data } = await axios.get(`/restaurant/search/${searchText}?${params.toString()}`, {
-             withCredentials: true,
-           });
-          if (data.success) set({ searchedRestaurant: data.data });
+          const { data } = await axios.get(
+            `/restaurant/search/${searchText}?${params.toString()}`
+          );
+          if (data.success) set({ searchedRestaurant: { data: data.data } });
+          else set({ searchedRestaurant: { data: [] } });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Search failed");
+          set({ searchedRestaurant: { data: [] } });
         } finally {
           set({ loading: false });
         }
       },
 
-      getSingleRestaurant: async (restaurantId: string) => {
+      getSingleRestaurant: async (restaurantId) => {
         await get().ensureAuthenticated();
         try {
-          const { data } = await axios.get(`/restaurant/${restaurantId}`, { withCredentials: true });
+          const { data } = await axios.get(`/restaurant/${restaurantId}`);
           if (data.success) set({ singleRestaurant: data.restaurant });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Failed to fetch restaurant");
         }
       },
 
-      // ---------------- Orders ----------------
       getRestaurantOrders: async () => {
         await get().ensureAuthenticated();
         try {
-          const { data } = await axios.get("/restaurant/order", { withCredentials: true });
+          const { data } = await axios.get("/restaurant/order");
           if (data.success) set({ restaurantOrder: data.orders });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Failed to fetch orders");
         }
       },
 
-      updateRestaurantOrder: async (orderId: string, status: string) => {
+      updateRestaurantOrder: async (orderId, status) => {
         await get().ensureAuthenticated();
         try {
           const { data } = await axios.put(`/restaurant/order/${orderId}/status`, { status });
           if (data.success) {
-            const updatedOrder = get().restaurantOrder.map((order: any) =>
+            const updatedOrder = get().restaurantOrder.map((order) =>
               order._id === orderId ? { ...order, status: data.status } : order
             );
             set({ restaurantOrder: updatedOrder });
@@ -491,19 +648,18 @@ export const useRestaurantStore = create<any>()(
         }
       },
 
-      // ---------------- Menu Management ----------------
-      addMenuToRestaurant: (menu: any) => {
-        set((state: any) => ({
+      addMenuToRestaurant: (menu) => {
+        set((state) => ({
           restaurant: state.restaurant
             ? { ...state.restaurant, menus: [...state.restaurant.menus, menu] }
             : null,
         }));
       },
 
-      updateMenuToRestaurant: (updatedMenu: any) => {
-        set((state: any) => {
+      updateMenuToRestaurant: (updatedMenu) => {
+        set((state) => {
           if (state.restaurant) {
-            const updatedMenuList = state.restaurant.menus.map((menu: any) =>
+            const updatedMenuList = state.restaurant.menus.map((menu) =>
               menu._id === updatedMenu._id ? updatedMenu : menu
             );
             return { restaurant: { ...state.restaurant, menus: updatedMenuList } };
@@ -512,13 +668,13 @@ export const useRestaurantStore = create<any>()(
         });
       },
 
-      removeMenuFromRestaurant: (menuId: string) => {
-        set((state: any) => {
+      removeMenuFromRestaurant: (menuId) => {
+        set((state) => {
           if (state.restaurant) {
             return {
               restaurant: {
                 ...state.restaurant,
-                menus: state.restaurant.menus.filter((menu: any) => menu._id !== menuId),
+                menus: state.restaurant.menus.filter((menu) => menu._id !== menuId),
               },
             };
           }
@@ -526,12 +682,11 @@ export const useRestaurantStore = create<any>()(
         });
       },
 
-      // ---------------- Filters ----------------
-      setAppliedFilter: (value: string) => {
-        set((state: any) => {
+      setAppliedFilter: (value) => {
+        set((state) => {
           const isAlreadyApplied = state.appliedFilter.includes(value);
           const updatedFilter = isAlreadyApplied
-            ? state.appliedFilter.filter((item: string) => item !== value)
+            ? state.appliedFilter.filter((item) => item !== value)
             : [...state.appliedFilter, value];
           return { appliedFilter: updatedFilter };
         });
