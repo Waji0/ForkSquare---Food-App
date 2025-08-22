@@ -51,7 +51,7 @@ const Success = () => {
               </div>
 
               {order.cartItems.map((item: CartItem) => (
-                <div key={item._id} className="mb-4">
+                <div key={item.menuId} className="mb-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <img
