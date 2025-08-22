@@ -274,17 +274,17 @@ import { User } from "../models/user.model"; // or your User type/interface
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string; // or mongoose.Types.ObjectId
-        email?: string;
-        // add more if you attach other fields in auth middleware
-      };
-    }
-  }
-}
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: {
+//         id: string; // or mongoose.Types.ObjectId
+//         email?: string;
+//         // add more if you attach other fields in auth middleware
+//       };
+//     }
+//   }
+// }
 
 
 // frontend request only (what you send to backend)
@@ -318,7 +318,7 @@ export interface Orders extends CheckoutSessionRequest {
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find({ user: req.id }).populate("user").populate("restaurant");
+    const orders = await Order.find({ user: req.user?.id }).populate("user").populate("restaurant");
     return res.status(200).json({ success: true, orders });
   } catch (error) {
     console.error(error);
