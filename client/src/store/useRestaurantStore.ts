@@ -282,6 +282,7 @@ export const useRestaurantStore = create<any>()(
           set({ loading: true });
           const { data } = await axios.post("/restaurant/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
           });
           if (data.success) toast.success(data.message);
           set({ loading: false });
@@ -294,7 +295,9 @@ export const useRestaurantStore = create<any>()(
       getRestaurant: async () => {
         try {
           set({ loading: true });
-          const { data } = await axios.get("/restaurant/");
+          const { data } = await axios.get("/restaurant/", {
+             withCredentials: true,
+           });
           if (data.success) set({ restaurant: data.restaurant, loading: false });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Failed to fetch restaurant");
@@ -307,6 +310,7 @@ export const useRestaurantStore = create<any>()(
           set({ loading: true });
           const { data } = await axios.put("/restaurant/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
           });
           if (data.success) toast.success(data.message || "Restaurant updated!");
           set({ loading: false });
@@ -318,13 +322,16 @@ export const useRestaurantStore = create<any>()(
 
       deleteRestaurant: async () => {
         try {
-          const { data } = await axios.delete("/restaurant/");
+          const { data } = await axios.delete("/restaurant/", {
+             withCredentials: true,
+           });
           if (data.success) toast.success(data.message || "Restaurant deleted");
           set({ restaurant: null });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Delete failed");
         }
       },
+
     }),
     {
       name: "restaurant-store",

@@ -32,7 +32,6 @@ export const generateToken = (res: Response, user: IUserDocument) => {
     sameSite: "none",          // allow cross-site
     secure: true,              // must be true for HTTPS
     maxAge: 24 * 60 * 60 * 1000, // 1 day
-    domain: ".vercel.app",     // optional, helps with subdomains
   });
 
   return token;
