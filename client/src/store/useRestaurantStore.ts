@@ -29,6 +29,7 @@ export const useRestaurantStore = create<RestaurantState>()(
             headers: {
               "Content-Type": "multipart/form-data",
             },
+            withCredentials: true,
           });
 
           if (response.data.success) {
@@ -44,7 +45,9 @@ export const useRestaurantStore = create<RestaurantState>()(
       getRestaurant: async () => {
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_END_POINT}/`);
+          const response = await axios.get(`${API_END_POINT}/`, {
+             withCredentials: true,
+          });
 
           if (response.data.success) {
             set({ loading: false, restaurant: response.data.restaurant });
@@ -65,6 +68,7 @@ export const useRestaurantStore = create<RestaurantState>()(
             headers: {
               "Content-Type": "multipart/form-data",
             },
+            withCredentials: true,
           });
 
           if (response.data.success) {
@@ -85,7 +89,9 @@ export const useRestaurantStore = create<RestaurantState>()(
 
       deleteRestaurant: async () => {
         try {
-          const response = await axios.delete(`${API_END_POINT}/`);
+          const response = await axios.delete(`${API_END_POINT}/`, {
+          withCredentials: true,
+          });
 
           if (response.data.success) {
             toast.success(
