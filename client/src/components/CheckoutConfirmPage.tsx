@@ -14,7 +14,7 @@ import { Loader2 } from "lucide-react";
 
 
 
-const CheckoutConfirmPage = ({ open, setOpen, totalAmount }: { open: boolean; setOpen: Dispatch<SetStateAction<boolean>>; totalAmount: number;}) => {
+const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispatch<SetStateAction<boolean>>;}) => {
 
     const { user } = useUserStore();
 
@@ -26,7 +26,7 @@ const CheckoutConfirmPage = ({ open, setOpen, totalAmount }: { open: boolean; se
         city: user?.city || "",
         country: user?.country || "",
         //self addition
-        totalAmount: totalAmount || 0,
+        // totalAmount: totalAmount || 0,
     });
 
     const { cart } = useCartStore();
@@ -56,7 +56,7 @@ const CheckoutConfirmPage = ({ open, setOpen, totalAmount }: { open: boolean; se
                     quantity: Number(cartItem.quantity) || 0,
                 })),
                 deliveryDetails: input,
-                restaurantId: restaurant?._id as string,
+                restaurantId: restaurant?._id as string || "",
                 // totalAmount: totalAmount,
                 // status: "pending",
             };

@@ -266,9 +266,10 @@
 
 import { Request, Response } from "express";
 import { Restaurant } from "../models/restaurant.model";
-import { Order } from "../models/order.model";
+import { IOrder, Order } from "../models/order.model";
 import Stripe from "stripe";
 import { User } from "../models/user.model"; // or your User type/interface
+import { IMenuDocument } from "../models/menu.model";
 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -389,16 +390,16 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       0
     );
 
-        const restaurant = await Restaurant.findById(restaurantId).populate('menus');
+    const restaurant = await Restaurant.findById(restaurantId).populate('menus');
 
-        if (!restaurant) {
-            return res.status(404).json({
+      if (!restaurant) {
+          return res.status(404).json({
                 success: false,
                 message: "Restaurant not found."
             });
         }
 
-        const order: any = new Order({
+        const order: IOrder = new Order({
             // user: req.id, 
             user: req.user.id,
             restaurant: restaurantId,
@@ -445,7 +446,7 @@ export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, 
 
     // 1. create line items
     const lineItems = checkoutSessionRequest.cartItems.map((cartItem) => {
-        const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
+        const menuItem = menuItems.find((item: IMenuDocument) => item._id.toString() === cartItem.menuId);
         if (!menuItem) throw new Error(`Menu item id not found`);
 
         return {

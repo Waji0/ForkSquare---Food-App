@@ -108,7 +108,7 @@ const Cart = () => {
         }
       </div>
 
-      <CheckoutConfirmPage open={open} setOpen={setOpen} totalAmount={totalAmount} />
+      <CheckoutConfirmPage open={open} setOpen={setOpen} />
 
     </div>
   );
