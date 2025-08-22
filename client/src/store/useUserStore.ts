@@ -270,6 +270,7 @@ export const useUserStore = create<UserState>()(
           set({ loading: true });
           const { data } = await axios.post("/user/signup", input, {
             headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           });
           if (data.success) {
             toast.success(data.message);
@@ -286,6 +287,7 @@ export const useUserStore = create<UserState>()(
           set({ loading: true });
           const { data } = await axios.post("/user/login", input, {
             headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           });
           if (data.success) {
             toast.success(data.message);
@@ -303,7 +305,7 @@ export const useUserStore = create<UserState>()(
           const { data } = await axios.post(
             "/user/verify-email",
             { verificationCode },
-            { headers: { "Content-Type": "application/json" } }
+            { headers: { "Content-Type": "application/json" }, withCredentials: true }
           );
           if (data.success) {
             toast.success(data.message);
@@ -318,7 +320,9 @@ export const useUserStore = create<UserState>()(
       checkAuthentication: async () => {
         try {
           set({ isCheckingAuth: true });
-          const { data } = await axios.get("/user/check-auth");
+          const { data } = await axios.get("/user/check-auth", {
+             withCredentials: true,
+           });
           if (data.success) {
             set({ user: data.user, isAuthenticated: true, isCheckingAuth: false });
           } else {
@@ -346,7 +350,9 @@ export const useUserStore = create<UserState>()(
       forgotPassword: async (email: string) => {
         try {
           set({ loading: true });
-          const { data } = await axios.post("/user/forgot-password", { email });
+          const { data } = await axios.post("/user/forgot-password", { email }, {
+             withCredentials: true,
+           });
           if (data.success) {
             toast.success(data.message);
           }
@@ -360,7 +366,9 @@ export const useUserStore = create<UserState>()(
       resetPassword: async (token: string, newPassword: string) => {
         try {
           set({ loading: true });
-          const { data } = await axios.post(`/user/reset-password/${token}`, { newPassword });
+          const { data } = await axios.post(`/user/reset-password/${token}`, { newPassword }, {
+             withCredentials: true,
+           });
           if (data.success) {
             toast.success(data.message);
             return true;
@@ -378,6 +386,7 @@ export const useUserStore = create<UserState>()(
         try {
           const { data } = await axios.put("/user/profile/update", input, {
             headers: { "Content-Type": "application/json" },
+             withCredentials: true,
           });
           if (data.success) {
             toast.success(data.message);
