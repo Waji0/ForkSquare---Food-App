@@ -46,7 +46,7 @@ const CheckoutConfirmPage = ({ open, setOpen, totalAmount }: { open: boolean; se
 
             const checkoutData: CheckoutSessionRequest = {
                 cartItems: cart.map((cartItem) => ({
-                    menuId: cartItem._id,
+                    menuId: cartItem.menuId,
                     name: cartItem.name,
                     // image: cartItem.imageUrl,
                     // price: cartItem.price.toString(),

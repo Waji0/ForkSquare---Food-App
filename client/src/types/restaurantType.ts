@@ -3,9 +3,10 @@ import type { Orders } from "./orderType";
 
 
 export type MenuItem = {
-    _id: string;
+    // _id: string;
+    menuId: string;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     imageUrl: string; //image:
 };
