@@ -18,13 +18,6 @@ const PORT = process.env.PORT || 3000;
 
 app.set("trust proxy", 1);
 
-
-// connect to DB before handling requests
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
-
 // default middleware for any mern project
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -43,6 +36,11 @@ app.get("/", (req, res) => {
   res.send("API is running");
 });
 
+// connect to DB before handling requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 //API
 app.use("/api/v1/user", userRoute);
@@ -51,10 +49,10 @@ app.use("/api/v1/menu", menuRoute);
 app.use("/api/v1/order", orderRoute);
 
 
-// app.listen(PORT, () => {
-//     connectDB();
-//     // console.log(`Server listen at port ${PORT}`);
-// });
+app.listen(PORT, () => {
+    connectDB();
+    console.log(`Server listen at port ${PORT}`);
+});
 
 
 
