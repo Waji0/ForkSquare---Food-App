@@ -264,6 +264,145 @@
 // <------------------------------------------------After Deploy------------------------------------------------>
 
 
+// import { Request, Response } from "express";
+// import { Restaurant } from "../models/restaurant.model";
+// import { Order } from "../models/order.model";
+// import Stripe from "stripe";
+
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+// type CheckoutSessionRequest = {
+//   cartItems: {
+//     menuId: string;
+//     name: string;
+//     image?: string;
+//     price: number;
+//     quantity: number;
+//   }[];
+//   deliveryDetails: {
+//     name: string;
+//     email: string;
+//     address: string;
+//     city: string;
+//     totalAmount: number;
+//   };
+//   restaurantId: string;
+// };
+
+// export const getOrders = async (req: Request, res: Response) => {
+//   try {
+//     const orders = await Order.find({ user: req.id }).populate("user").populate("restaurant");
+//     return res.status(200).json({ success: true, orders });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ success: false, message: "Internal server error" });
+//   }
+// };
+
+// export const createCheckoutSession = async (req: Request, res: Response) => {
+//   try {
+//     const checkoutSessionRequest: CheckoutSessionRequest = req.body;
+
+//     // 1️⃣ Fetch restaurant and menus
+//     const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate("menus");
+//     if (!restaurant) {
+//       return res.status(404).json({ success: false, message: "Restaurant not found." });
+//     }
+//     const menuItems = restaurant.menus as any[];
+
+//     // 2️⃣ Enrich cart items with restaurant data
+//     const enrichedCartItems = checkoutSessionRequest.cartItems
+//       .map((cartItem) => {
+//         const menu = menuItems.find((m) => m._id.toString() === cartItem.menuId);
+//         if (!menu) return null;
+
+//         return {
+//           menuId: menu._id.toString(),
+//           name: menu.name,
+//           price: menu.price,
+//           quantity: cartItem.quantity,
+//           imageUrl: menu.imageUrl || "https://example.com/placeholder.png",
+//         };
+//       })
+//       .filter(Boolean) as {
+//       menuId: string;
+//       name: string;
+//       price: number;
+//       quantity: number;
+//       imageUrl: string;
+//     }[];
+
+//     if (enrichedCartItems.length === 0) {
+//       return res.status(400).json({ success: false, message: "No valid cart items found." });
+//     }
+
+//     // 3️⃣ Create order
+//     const order: any = new Order({
+//       restaurant: restaurant._id,
+//       user: req.id,
+//       deliveryDetails: checkoutSessionRequest.deliveryDetails,
+//       cartItems: enrichedCartItems,
+//       status: "pending",
+//       totalAmount: checkoutSessionRequest.deliveryDetails.totalAmount,
+//     });
+
+//     // 4️⃣ Create Stripe line items
+//     const lineItems = createLineItems(
+//       {
+//         cartItems: enrichedCartItems,
+//         deliveryDetails: checkoutSessionRequest.deliveryDetails,
+//         restaurantId: checkoutSessionRequest.restaurantId,
+//       },
+//       menuItems
+//     );
+
+//     // 5️⃣ Create Stripe checkout session
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       shipping_address_collection: { allowed_countries: ["GB", "US", "CA"] },
+//       line_items: lineItems,
+//       mode: "payment",
+//       success_url: `${process.env.FRONTEND_URL}/order/status`,
+//       cancel_url: `${process.env.FRONTEND_URL}/cart`,
+//       metadata: {
+//         orderId: order._id.toString(),
+//         images: JSON.stringify(enrichedCartItems.map((i) => i.imageUrl)),
+//       },
+//     });
+
+//     // 6️⃣ Save order and respond
+//     await order.save();
+//     return res.status(200).json({ session });
+//   } catch (error: any) {
+//     console.error("Checkout error:", error);
+//     return res.status(500).json({ message: error.message || "Internal server error" });
+//   }
+// };
+
+// // ---------------- Helper: createLineItems ----------------
+// export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, menuItems: any) => {
+//   return checkoutSessionRequest.cartItems.map((cartItem) => {
+//     const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
+//     if (!menuItem) throw new Error(`Menu item id not found: ${cartItem.menuId}`);
+
+//     const productData: any = { name: menuItem.name };
+//     if (menuItem.imageUrl) productData.images = [menuItem.imageUrl];
+
+//     return {
+//       price_data: {
+//         currency: "inr",
+//         product_data: productData,
+//         unit_amount: menuItem.price * 100,
+//       },
+//       quantity: cartItem.quantity,
+//     };
+//   });
+// };
+
+
+
+
+
 import { Request, Response } from "express";
 import { Restaurant } from "../models/restaurant.model";
 import { Order } from "../models/order.model";
@@ -275,19 +414,22 @@ type CheckoutSessionRequest = {
   cartItems: {
     menuId: string;
     name: string;
-    image?: string;
     price: number;
     quantity: number;
+    image: string;
   }[];
   deliveryDetails: {
     name: string;
     email: string;
+    contact?: string;
     address: string;
     city: string;
+    country?: string;
     totalAmount: number;
   };
   restaurantId: string;
 };
+
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
@@ -299,38 +441,36 @@ export const getOrders = async (req: Request, res: Response) => {
   }
 };
 
+
+
 export const createCheckoutSession = async (req: Request, res: Response) => {
   try {
     const checkoutSessionRequest: CheckoutSessionRequest = req.body;
 
-    // 1️⃣ Fetch restaurant and menus
+    // 1️⃣ Fetch restaurant and populate menus
     const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate("menus");
     if (!restaurant) {
       return res.status(404).json({ success: false, message: "Restaurant not found." });
     }
+
     const menuItems = restaurant.menus as any[];
 
-    // 2️⃣ Enrich cart items with restaurant data
+    // 2️⃣ Validate & enrich cart items
     const enrichedCartItems = checkoutSessionRequest.cartItems
-      .map((cartItem) => {
-        const menu = menuItems.find((m) => m._id.toString() === cartItem.menuId);
+      .map((item) => {
+        const menu = menuItems.find((m) => m._id.toString() === item.menuId);
         if (!menu) return null;
 
         return {
           menuId: menu._id.toString(),
           name: menu.name,
-          price: menu.price,
-          quantity: cartItem.quantity,
-          imageUrl: menu.imageUrl || "https://example.com/placeholder.png",
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+        //   image: menu.imageUrl || "https://example.com/placeholder.png",
+          imageUrl: item.image,
         };
       })
-      .filter(Boolean) as {
-      menuId: string;
-      name: string;
-      price: number;
-      quantity: number;
-      imageUrl: string;
-    }[];
+      .filter(Boolean);
 
     if (enrichedCartItems.length === 0) {
       return res.status(400).json({ success: false, message: "No valid cart items found." });
@@ -346,15 +486,18 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       totalAmount: checkoutSessionRequest.deliveryDetails.totalAmount,
     });
 
-    // 4️⃣ Create Stripe line items
-    const lineItems = createLineItems(
-      {
-        cartItems: enrichedCartItems,
-        deliveryDetails: checkoutSessionRequest.deliveryDetails,
-        restaurantId: checkoutSessionRequest.restaurantId,
+    // 4️⃣ Prepare Stripe line items
+    const lineItems = enrichedCartItems.map((cartItem) => ({
+      price_data: {
+        currency: "inr",
+        product_data: {
+          name: cartItem?.name || "",
+          images: cartItem?.imageUrl ? [cartItem.imageUrl] : [],
+        },
+        unit_amount: (cartItem?.price ? cartItem.price * 100 : 0),
       },
-      menuItems
-    );
+      quantity: cartItem?.quantity,
+    }));
 
     // 5️⃣ Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -366,35 +509,15 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       cancel_url: `${process.env.FRONTEND_URL}/cart`,
       metadata: {
         orderId: order._id.toString(),
-        images: JSON.stringify(enrichedCartItems.map((i) => i.imageUrl)),
       },
     });
 
-    // 6️⃣ Save order and respond
+    // 6️⃣ Save order & return session
     await order.save();
     return res.status(200).json({ session });
+
   } catch (error: any) {
     console.error("Checkout error:", error);
-    return res.status(500).json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ success: false, message: error.message || "Internal server error" });
   }
-};
-
-// ---------------- Helper: createLineItems ----------------
-export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, menuItems: any) => {
-  return checkoutSessionRequest.cartItems.map((cartItem) => {
-    const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
-    if (!menuItem) throw new Error(`Menu item id not found: ${cartItem.menuId}`);
-
-    const productData: any = { name: menuItem.name };
-    if (menuItem.imageUrl) productData.images = [menuItem.imageUrl];
-
-    return {
-      price_data: {
-        currency: "inr",
-        product_data: productData,
-        unit_amount: menuItem.price * 100,
-      },
-      quantity: cartItem.quantity,
-    };
-  });
 };

@@ -3,7 +3,7 @@ export type CheckoutSessionRequest = {
     cartItems:{
         menuId:string;
         name:string;
-        image:string;
+        imageUrl:string;
         // price:string;
         // quantity:string;
         price:number;
