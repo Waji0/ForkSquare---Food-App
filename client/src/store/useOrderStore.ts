@@ -14,26 +14,26 @@
 //     loading: false,
 //     orders: [],
 
-//     createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
-//         try {
-//             set({ loading: true });
-//             const response = await axios.post(`${API_END_POINT}/checkout/create-checkout-session`, checkoutSession, {
-//                 headers: {
-//                     'Content-Type': 'application/json'
-//                 },
-//                 withCredentials: true,
-//             });
+    // createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
+    //     try {
+    //         set({ loading: true });
+    //         const response = await axios.post(`${API_END_POINT}/checkout/create-checkout-session`, checkoutSession, {
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             withCredentials: true,
+    //         });
 
-//             // clear Cart after Checkout // Self
-//             // console.log("Successfully Checkout now clearing cart");
-//             useCartStore.getState().clearCart();
+    //         // clear Cart after Checkout // Self
+    //         // console.log("Successfully Checkout now clearing cart");
+    //         useCartStore.getState().clearCart();
 
-//             window.location.href = response.data.session.url;
-//             set({ loading: false });
-//         } catch (error) {
-//             set({ loading: false });
-//         }
-//     },
+    //         window.location.href = response.data.session.url;
+    //         set({ loading: false });
+    //     } catch (error) {
+    //         set({ loading: false });
+    //     }
+    // },
 
 //     getOrderDetails: async () => {
 //         try {
@@ -59,46 +59,46 @@
 //       loading: false,
 //       orders: [],
 
-//       createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
-//         try {
-//           set({ loading: true });
+      // createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
+      //   try {
+      //     set({ loading: true });
 
-//           // ---------------- Validation ----------------
-//           const validCartItems = checkoutSession.cartItems.filter(
-//             (item) => item.menuId && Number(item.price) > 0 && Number(item.quantity) > 0
-//           );
+      //     // ---------------- Validation ----------------
+      //     const validCartItems = checkoutSession.cartItems.filter(
+      //       (item) => item.menuId && Number(item.price) > 0 && Number(item.quantity) > 0
+      //     );
 
-//           if (validCartItems.length === 0) {
-//             set({ loading: false });
-//             alert("Your cart is empty or contains invalid items.");
-//             return;
-//           }
+      //     if (validCartItems.length === 0) {
+      //       set({ loading: false });
+      //       alert("Your cart is empty or contains invalid items.");
+      //       return;
+      //     }
 
-//           const validatedCheckoutSession: CheckoutSessionRequest = {
-//             ...checkoutSession,
-//             cartItems: validCartItems,
-//           };
+      //     const validatedCheckoutSession: CheckoutSessionRequest = {
+      //       ...checkoutSession,
+      //       cartItems: validCartItems,
+      //     };
 
-//           const response = await axios.post(
-//             `${API_END_POINT}/checkout/create-checkout-session`,
-//             validatedCheckoutSession,
-//             {
-//               headers: { "Content-Type": "application/json" },
-//               withCredentials: true,
-//             }
-//           );
+      //     const response = await axios.post(
+      //       `${API_END_POINT}/checkout/create-checkout-session`,
+      //       validatedCheckoutSession,
+      //       {
+      //         headers: { "Content-Type": "application/json" },
+      //         withCredentials: true,
+      //       }
+      //     );
 
-//           // Clear Cart after successful checkout
-//           useCartStore.getState().clearCart();
+      //     // Clear Cart after successful checkout
+      //     useCartStore.getState().clearCart();
 
-//           window.location.href = response.data.session.url;
-//           set({ loading: false });
-//         } catch (error: any) {
-//           console.error("Checkout error:", error);
-//           set({ loading: false });
-//           alert(error.response?.data?.message || "Failed to create checkout session");
-//         }
-//       },
+      //     window.location.href = response.data.session.url;
+      //     set({ loading: false });
+      //   } catch (error: any) {
+      //     console.error("Checkout error:", error);
+      //     set({ loading: false });
+      //     alert(error.response?.data?.message || "Failed to create checkout session");
+      //   }
+      // },
 
 //       getOrderDetails: async () => {
 //         try {
@@ -130,59 +130,59 @@
 //       loading: false,
 //       orders: [],
 
-//       createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
-//         try {
-//           set({ loading: true });
+      // createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
+      //   try {
+      //     set({ loading: true });
 
-//           // ---------------- Filter valid cart items ----------------
-//           const validCartItems = checkoutSession.cartItems
-//             .filter(
-//               (item) =>
-//                 item.menuId &&
-//                 Number(item.price) > 0 &&
-//                 Number(item.quantity) > 0
-//             )
-//             .map((item) => ({
-//               menuId: item.menuId,
-//               name: item.name,
-//               price: item.price,
-//               quantity: item.quantity,
-//               image: item.image || undefined, // ✅ send undefined if no image
-//             }));
+      //     // ---------------- Filter valid cart items ----------------
+      //     const validCartItems = checkoutSession.cartItems
+      //       .filter(
+      //         (item) =>
+      //           item.menuId &&
+      //           Number(item.price) > 0 &&
+      //           Number(item.quantity) > 0
+      //       )
+      //       .map((item) => ({
+      //         menuId: item.menuId,
+      //         name: item.name,
+      //         price: item.price,
+      //         quantity: item.quantity,
+      //         image: item.image || undefined, // ✅ send undefined if no image
+      //       }));
 
-//           if (validCartItems.length === 0) {
-//             set({ loading: false });
-//             alert("Your cart is empty or contains invalid items.");
-//             return;
-//           }
+      //     if (validCartItems.length === 0) {
+      //       set({ loading: false });
+      //       alert("Your cart is empty or contains invalid items.");
+      //       return;
+      //     }
 
-//           const validatedCheckoutSession: CheckoutSessionRequest = {
-//             ...checkoutSession,
-//             cartItems: validCartItems,
-//           };
+      //     const validatedCheckoutSession: CheckoutSessionRequest = {
+      //       ...checkoutSession,
+      //       cartItems: validCartItems,
+      //     };
 
-//           // ---------------- Send to backend ----------------
-//           const response = await axios.post(
-//             `${API_END_POINT}/checkout/create-checkout-session`,
-//             validatedCheckoutSession,
-//             {
-//               headers: { "Content-Type": "application/json" },
-//               withCredentials: true,
-//             }
-//           );
+      //     // ---------------- Send to backend ----------------
+      //     const response = await axios.post(
+      //       `${API_END_POINT}/checkout/create-checkout-session`,
+      //       validatedCheckoutSession,
+      //       {
+      //         headers: { "Content-Type": "application/json" },
+      //         withCredentials: true,
+      //       }
+      //     );
 
-//           // ---------------- Clear cart ----------------
-//           useCartStore.getState().clearCart();
+      //     // ---------------- Clear cart ----------------
+      //     useCartStore.getState().clearCart();
 
-//           // ---------------- Redirect to Stripe ----------------
-//           window.location.href = response.data.session.url;
-//           set({ loading: false });
-//         } catch (error: any) {
-//           console.error("Checkout error:", error);
-//           set({ loading: false });
-//           alert(error.response?.data?.message || "Failed to create checkout session");
-//         }
-//       },
+      //     // ---------------- Redirect to Stripe ----------------
+      //     window.location.href = response.data.session.url;
+      //     set({ loading: false });
+      //   } catch (error: any) {
+      //     console.error("Checkout error:", error);
+      //     set({ loading: false });
+      //     alert(error.response?.data?.message || "Failed to create checkout session");
+      //   }
+      // },
 
 //       getOrderDetails: async () => {
 //         try {
@@ -273,73 +273,93 @@ export const useOrderStore = create<OrderState>()(
       //     }
       //   },
 
-      createCheckoutSession: async (
-        checkoutSession: CheckoutSessionRequest
-      ) => {
+      // createCheckoutSession: async (
+      //   checkoutSession: CheckoutSessionRequest
+      // ) => {
+      //   try {
+      //     set({ loading: true });
+
+      //     // ✅ Enrich & validate cart items
+      //     const enrichedCartItems = checkoutSession.cartItems
+      //       .map((item) => {
+      //         if (!item) return null; // handle possible null
+
+      //         return {
+      //           menuId: item.menuId,
+      //           name: item.name,
+      //           price: Number(item.price), // convert to number
+      //           quantity: Number(item.quantity), // convert to number
+      //           imageUrl: item.imageUrl || "https://example.com/placeholder.png", // fallback
+      //         };
+      //       })
+      //       .filter(
+      //         (
+      //           item
+      //         ): item is {
+      //           menuId: string;
+      //           name: string;
+      //           price: number;
+      //           quantity: number;
+      //           imageUrl: string;
+      //         } => item !== null
+      //       );
+
+      //     if (enrichedCartItems.length === 0) {
+      //       set({ loading: false });
+      //       alert("Your cart is empty or contains invalid items.");
+      //       return;
+      //     }
+
+      //     // ✅ Prepare payload
+      //     const validatedCheckoutSession: CheckoutSessionRequest = {
+      //       ...checkoutSession,
+      //       cartItems: enrichedCartItems,
+      //     };
+
+      //     // ✅ Send to backend
+      //     const response = await axios.post(
+      //       `${API_END_POINT}/checkout/create-checkout-session`,
+      //       validatedCheckoutSession,
+      //       {
+      //         headers: { "Content-Type": "application/json" },
+      //         withCredentials: true,
+      //       }
+      //     );
+
+      //     // ✅ Clear cart
+      //     useCartStore.getState().clearCart();
+
+      //     // ✅ Redirect to Stripe
+      //     window.location.href = response.data.session.url;
+      //     set({ loading: false });
+      //   } catch (error: any) {
+      //     console.error("Checkout error:", error);
+      //     set({ loading: false });
+      //     alert(
+      //       error.response?.data?.message || "Failed to create checkout session"
+      //     );
+      //   }
+      // },
+
+      createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
         try {
-          set({ loading: true });
+            set({ loading: true });
+            const response = await axios.post(`${API_END_POINT}/checkout/create-checkout-session`, checkoutSession, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true,
+            });
 
-          // ✅ Enrich & validate cart items
-          const enrichedCartItems = checkoutSession.cartItems
-            .map((item) => {
-              if (!item) return null; // handle possible null
+            // clear Cart after Checkout // Self
+            useCartStore.getState().clearCart();
 
-              return {
-                menuId: item.menuId,
-                name: item.name,
-                price: Number(item.price), // convert to number
-                quantity: Number(item.quantity), // convert to number
-                imageUrl: item.imageUrl || "https://example.com/placeholder.png", // fallback
-              };
-            })
-            .filter(
-              (
-                item
-              ): item is {
-                menuId: string;
-                name: string;
-                price: number;
-                quantity: number;
-                imageUrl: string;
-              } => item !== null
-            );
-
-          if (enrichedCartItems.length === 0) {
+            window.location.href = response.data.session.url;
             set({ loading: false });
-            alert("Your cart is empty or contains invalid items.");
-            return;
-          }
-
-          // ✅ Prepare payload
-          const validatedCheckoutSession: CheckoutSessionRequest = {
-            ...checkoutSession,
-            cartItems: enrichedCartItems,
-          };
-
-          // ✅ Send to backend
-          const response = await axios.post(
-            `${API_END_POINT}/checkout/create-checkout-session`,
-            validatedCheckoutSession,
-            {
-              headers: { "Content-Type": "application/json" },
-              withCredentials: true,
-            }
-          );
-
-          // ✅ Clear cart
-          useCartStore.getState().clearCart();
-
-          // ✅ Redirect to Stripe
-          window.location.href = response.data.session.url;
-          set({ loading: false });
-        } catch (error: any) {
-          console.error("Checkout error:", error);
-          set({ loading: false });
-          alert(
-            error.response?.data?.message || "Failed to create checkout session"
-          );
+        } catch (error) {
+            set({ loading: false });
         }
-      },
+    },
 
       getOrderDetails: async () => {
         try {
