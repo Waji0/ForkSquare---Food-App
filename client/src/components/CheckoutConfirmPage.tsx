@@ -57,6 +57,8 @@ const CheckoutConfirmPage = ({ open, setOpen, totalAmount }: { open: boolean; se
                 })),
                 deliveryDetails: input,
                 restaurantId: restaurant?._id as string,
+                // totalAmount: totalAmount,
+                // status: "pending",
             };
 
             await createCheckoutSession(checkoutData);

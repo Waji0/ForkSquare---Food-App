@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
 
 type DeliveryDetails = {
     email: string;
@@ -21,7 +21,7 @@ export interface IOrder extends Document {
     deliveryDetails: DeliveryDetails,
     cartItems: CartItems;
     totalAmount: number;
-    status: "pending" | "confirmed" | "preparing" | "outfordelivery" | "delivered"
+    status: "pending" | "confirmed" | "preparing" | "outfordelivery" | "delivered";
 }
 
 const orderSchema = new mongoose.Schema<IOrder>({
@@ -30,17 +30,20 @@ const orderSchema = new mongoose.Schema<IOrder>({
         ref: 'User',
         required: true
     },
+
     restaurant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant',
         required: true
     },
+
     deliveryDetails: {
         email: {type:String, required:true},
         name: {type:String, required:true},
         address: {type:String, required:true},
         city: {type:String, required:true},
     },
+
     cartItems: [
         {
             menuId: {type:String, required:true},
@@ -50,7 +53,9 @@ const orderSchema = new mongoose.Schema<IOrder>({
             quantity: {type:Number, required:true},
         }
     ],
+
     totalAmount: Number,
+
     status: {
         type: String,
         enum: ["pending" , "confirmed" , "preparing" , "outfordelivery" , "delivered"],
@@ -61,4 +66,5 @@ const orderSchema = new mongoose.Schema<IOrder>({
 }, { timestamps: true });
 
 
-export const Order = mongoose.model("Order", orderSchema);
+// export const Order = mongoose.model("Order", orderSchema);
+export const Order : Model<IOrder> = mongoose.model<IOrder>("Order", orderSchema);
