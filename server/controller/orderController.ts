@@ -391,6 +391,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       0
     );
 
+    console.log("try  to find res by resId");
+
     const restaurant = await Restaurant.findById(restaurantId).populate('menus');
 
       if (!restaurant) {
@@ -410,9 +412,13 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
             status: "pending", // always start with pending
         });
 
+        console.log("Order Created - Before line item");
+
         // line items for Stripe
         const menuItems = restaurant.menus;
         const lineItems = createLineItems(checkoutSessionRequest, menuItems);
+
+        console.log("lineItems Created - Before stripe.checkout.sessions.create", lineItems);
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
