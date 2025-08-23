@@ -274,20 +274,6 @@ import { IMenuDocument } from "../models/menu.model";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       user?: {
-//         id: string; // or mongoose.Types.ObjectId
-//         email?: string;
-//         // add more if you attach other fields in auth middleware
-//       };
-//     }
-//   }
-// }
-
-
 // frontend request only (what you send to backend)
 export type CheckoutSessionRequest = {
 

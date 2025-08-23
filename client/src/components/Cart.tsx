@@ -40,7 +40,7 @@ const Cart = () => {
 
         <TableBody>
           {cart.map((item: CartItem) => (
-            <TableRow key={item.menuId}>
+            <TableRow key={item._id}>
               <TableCell>
                 <Avatar>
                   <AvatarImage src={item.imageUrl} alt="" />
@@ -53,7 +53,7 @@ const Cart = () => {
                 {/* // border border-gray-100 dark:border-gray-800 */}
                 <div className="w-fit flex items-center rounded-full border border-none shadow-md">
                   <Button
-                  onClick={() => decrementQuantity(item.menuId)}
+                  onClick={() => decrementQuantity(item._id)}
                     size={"icon"}
                     variant={"outline"}
                     className="rounded-full bg-gray-200"
@@ -69,7 +69,7 @@ const Cart = () => {
                     {item.quantity}
                   </Button>
                   <Button
-                  onClick={() => incrementQuantity(item.menuId)}
+                  onClick={() => incrementQuantity(item._id)}
                     size={"icon"}
                     className="rounded-full bg-orange hover:bg-hoverOrange"
                     variant={"outline"}
@@ -80,7 +80,7 @@ const Cart = () => {
               </TableCell>
               <TableCell>{item.price * item.quantity}</TableCell>
               <TableCell className="text-right">
-                <Button onClick={() => removeFromTheCart(item.menuId)} size={"sm"} className="bg-orange hover:bg-hoverOrange">
+                <Button onClick={() => removeFromTheCart(item._id)} size={"sm"} className="bg-orange hover:bg-hoverOrange">
                   Remove
                 </Button>
               </TableCell>

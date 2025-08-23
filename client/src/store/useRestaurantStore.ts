@@ -665,7 +665,7 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
         set((state) => {
           if (state.restaurant) {
             const updatedMenuList = state.restaurant.menus.map((menu) =>
-              menu.menuId === updatedMenu.menuId ? updatedMenu : menu
+              menu._id === updatedMenu._id ? updatedMenu : menu
             );
             return { restaurant: { ...state.restaurant, menus: updatedMenuList } };
           }
@@ -679,7 +679,7 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
             return {
               restaurant: {
                 ...state.restaurant,
-                menus: state.restaurant.menus.filter((menu) => menu.menuId !== menuId),
+                menus: state.restaurant.menus.filter((menu) => menu._id !== menuId),
               },
             };
           }

@@ -341,7 +341,7 @@ export const useOrderStore = create<OrderState>()(
       //   }
       // },
 
-      createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
+    createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
         try {
             set({ loading: true });
             console.log("try to send checkoutSessionData to backend");

@@ -3,8 +3,8 @@ import type { Orders } from "./orderType";
 
 
 export type MenuItem = {
-    // _id: string;
-    menuId: string;
+    _id: string;
+    // menuId: string;
     name: string;
     description?: string;
     price: number;
