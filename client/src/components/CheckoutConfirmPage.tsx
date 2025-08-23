@@ -30,8 +30,8 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     });
 
     const { cart } = useCartStore();
-    const { restaurant, singleRestaurant } = useRestaurantStore();
-    console.log("singleRestaurant from restaurantStore", singleRestaurant);
+    const { singleRestaurant } = useRestaurantStore(); //  restaurant
+    // console.log("singleRestaurant from restaurantStore", singleRestaurant);
     const { createCheckoutSession, loading } = useOrderStore();
 
     const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +57,7 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
                     quantity: Number(cartItem.quantity) || 0,
                 })),
                 deliveryDetails: input,
-                restaurantId: restaurant?._id as string || "",
+                restaurantId: singleRestaurant?._id as string || "",
                 // totalAmount: totalAmount,
                 // status: "pending",
             };
