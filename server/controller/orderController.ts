@@ -372,24 +372,32 @@ export const getOrders = async (req: Request, res: Response) => {
 export const createCheckoutSession = async (req: Request, res: Response) => {
     try {
 
+      console.log("right now in backend createCheckoutSession orderController");
+
       // if (!req.user || !req.user.id) {
       if (!req.id) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
-       }
+      }
+      
+      console.log("req.id exists in backend createCheckoutSession orderController", req.id);
 
     const checkoutSessionRequest: CheckoutSessionRequest = req.body;
+    console.log("checkoutSessionREquest in backend createCheckoutSession orderController", checkoutSessionRequest);
     // const { cartItems, deliveryDetails, restaurantId } = req.body;
     const { cartItems, deliveryDetails, restaurantId } = checkoutSessionRequest;
+    console.log("cartItems, deliveryDetails, restaurantId in backend createCheckoutSession orderController", cartItems, deliveryDetails, restaurantId);
 
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
+    console.log("cart exists in backend createCheckoutSession orderController", cartItems, cartItems.length);
 
     // Calculate total amount server-side
     const totalAmount = cartItems.reduce(
       (sum: number, item: any) => sum + item.price * item.quantity,
       0
     );
+    console.log("totalAmount in backend createCheckoutSession orderController", totalAmount);
 
     console.log("try  to find res by resId");
 

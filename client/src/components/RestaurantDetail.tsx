@@ -10,11 +10,12 @@ import { useParams } from "react-router-dom";
 const RestaurantDetail = () => {
 
   const params = useParams();
-  const { singleRestaurant, getSingleRestaurant } = useRestaurantStore();
+  const { singleRestaurant, getSingleRestaurant, getRestaurant } = useRestaurantStore();
 
   useEffect(() => {
     
-    getSingleRestaurant(params.id!); 
+    getSingleRestaurant(params.id!);
+    getRestaurant(); //
 
   }, [params.id]);
 

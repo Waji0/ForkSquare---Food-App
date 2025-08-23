@@ -344,12 +344,15 @@ export const useOrderStore = create<OrderState>()(
       createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
         try {
             set({ loading: true });
+            console.log("try to send checkoutSessionData to backend");
             const response = await axios.post(`${API_END_POINT}/checkout/create-checkout-session`, checkoutSession, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true,
             });
+            
+            console.log("comeback from backend with response", response);
 
             // clear Cart after Checkout // Self
             useCartStore.getState().clearCart();

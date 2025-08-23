@@ -30,8 +30,8 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     });
 
     const { cart } = useCartStore();
-    const { singleRestaurant } = useRestaurantStore(); //  restaurant
-    // console.log("singleRestaurant from restaurantStore", singleRestaurant);
+    const { singleRestaurant, restaurant } = useRestaurantStore();
+    console.log("singleRestaurant & Restaurant from restaurantStore", singleRestaurant, " ",  restaurant);
     const { createCheckoutSession, loading } = useOrderStore();
 
     const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +44,8 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
 
         // API Implementation
         try {
+
+            console.log("checkoutHandler call in try block after Continue To Payment");
 
             const checkoutData: CheckoutSessionRequest = {
                 cartItems: cart.map((cartItem) => ({
@@ -61,6 +63,8 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
                 // totalAmount: totalAmount,
                 // status: "pending",
             };
+
+            console.log("checkoutData ready now passing it createCheckoutSession from orderStore ", checkoutData);
 
             await createCheckoutSession(checkoutData);
 
