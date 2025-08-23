@@ -218,153 +218,38 @@ export const useOrderStore = create<OrderState>()(
       loading: false,
       orders: [],
 
-      //   createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
-      //     try {
-      //       set({ loading: true });
-
-      //       // 1️⃣ Validate and convert cart items
-      //       const validCartItems = checkoutSession.cartItems
-      //         .filter(
-      //           (item) =>
-      //             item.menuId &&
-      //             Number(item.price) > 0 &&
-      //             Number(item.quantity) > 0
-      //         )
-      //         .map((item) => ({
-      //           menuId: item.menuId,
-      //           name: item.name,
-      //           price: Number(item.price),       // ✅ Convert to number
-      //           quantity: Number(item.quantity), // ✅ Convert to number
-      //           image: item.image || "https://example.com/placeholder.png", // ✅ Use `image` (matches backend)
-      //         }));
-
-      //       if (validCartItems.length === 0) {
-      //         set({ loading: false });
-      //         alert("Your cart is empty or contains invalid items.");
-      //         return;
-      //       }
-
-      //       // 2️⃣ Build validated payload
-      //       const validatedCheckoutSession: CheckoutSessionRequest = {
-      //         ...checkoutSession,
-      //         cartItems: validCartItems,
-      //       };
-
-      //       // 3️⃣ Send to backend
-      //       const response = await axios.post(
-      //         `${API_END_POINT}/checkout/create-checkout-session`,
-      //         validatedCheckoutSession,
-      //         {
-      //           headers: { "Content-Type": "application/json" },
-      //           withCredentials: true,
-      //         }
-      //       );
-
-      //       // 4️⃣ Clear cart
-      //       useCartStore.getState().clearCart();
-
-      //       // 5️⃣ Redirect to Stripe
-      //       window.location.href = response.data.session.url;
-      //       set({ loading: false });
-      //     } catch (error: any) {
-      //       console.error("Checkout error:", error);
-      //       set({ loading: false });
-      //       alert(error.response?.data?.message || "Failed to create checkout session");
-      //     }
-      //   },
-
-      // createCheckoutSession: async (
-      //   checkoutSession: CheckoutSessionRequest
-      // ) => {
-      //   try {
-      //     set({ loading: true });
-
-      //     // ✅ Enrich & validate cart items
-      //     const enrichedCartItems = checkoutSession.cartItems
-      //       .map((item) => {
-      //         if (!item) return null; // handle possible null
-
-      //         return {
-      //           menuId: item.menuId,
-      //           name: item.name,
-      //           price: Number(item.price), // convert to number
-      //           quantity: Number(item.quantity), // convert to number
-      //           imageUrl: item.imageUrl || "https://example.com/placeholder.png", // fallback
-      //         };
-      //       })
-      //       .filter(
-      //         (
-      //           item
-      //         ): item is {
-      //           menuId: string;
-      //           name: string;
-      //           price: number;
-      //           quantity: number;
-      //           imageUrl: string;
-      //         } => item !== null
-      //       );
-
-      //     if (enrichedCartItems.length === 0) {
-      //       set({ loading: false });
-      //       alert("Your cart is empty or contains invalid items.");
-      //       return;
-      //     }
-
-      //     // ✅ Prepare payload
-      //     const validatedCheckoutSession: CheckoutSessionRequest = {
-      //       ...checkoutSession,
-      //       cartItems: enrichedCartItems,
-      //     };
-
-      //     // ✅ Send to backend
-      //     const response = await axios.post(
-      //       `${API_END_POINT}/checkout/create-checkout-session`,
-      //       validatedCheckoutSession,
-      //       {
-      //         headers: { "Content-Type": "application/json" },
-      //         withCredentials: true,
-      //       }
-      //     );
-
-      //     // ✅ Clear cart
-      //     useCartStore.getState().clearCart();
-
-      //     // ✅ Redirect to Stripe
-      //     window.location.href = response.data.session.url;
-      //     set({ loading: false });
-      //   } catch (error: any) {
-      //     console.error("Checkout error:", error);
-      //     set({ loading: false });
-      //     alert(
-      //       error.response?.data?.message || "Failed to create checkout session"
-      //     );
-      //   }
-      // },
-
     createCheckoutSession: async (checkoutSession: CheckoutSessionRequest) => {
-        try {
-            set({ loading: true });
-            console.log("try to send checkoutSessionData to backend");
-            const response = await axios.post(`${API_END_POINT}/checkout/create-checkout-session`, checkoutSession, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true,
-            });
-            
-            console.log("comeback from backend with response", response);
+    try {
+      set({ loading: true });
+      console.log("Sending checkoutSession to backend:", checkoutSession);
 
-            // clear Cart after Checkout // Self
-            useCartStore.getState().clearCart();
-
-            window.location.href = response.data.session.url;
-            set({ loading: false });
-        } catch (error) {
-            set({ loading: false });
+      const response = await axios.post(
+        `${API_END_POINT}/checkout/create-checkout-session`,
+        checkoutSession,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
         }
+      );
+
+      console.log("Stripe session response:", response.data);
+
+      // ✅ Clear Cart after checkout
+      useCartStore.getState().clearCart();
+
+      // ✅ Redirect user to Stripe Checkout
+      window.location.href = response.data.session.url;
+
+      set({ loading: false });
+    } catch (error: any) {
+      console.error("createCheckoutSession error:", error);
+      set({ loading: false });
+    }
     },
 
-      getOrderDetails: async () => {
+    getOrderDetails: async () => {
         try {
           set({ loading: true });
           const response = await axios.get(`${API_END_POINT}/`, {
@@ -375,7 +260,8 @@ export const useOrderStore = create<OrderState>()(
           console.error(error);
           set({ loading: false });
         }
-      },
+    },
+
     }),
     {
       name: "order-name",

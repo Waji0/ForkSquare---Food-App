@@ -10,7 +10,7 @@ export interface IRestaurant {
     // imageUrl: string;
     imageUrl: string;
     imageId: string;
-    menus: mongoose.Schema.Types.ObjectId[]
+    menus: mongoose.Schema.Types.ObjectId[];
 }
 
 export interface IRestaurantDocument extends IRestaurant, Document {

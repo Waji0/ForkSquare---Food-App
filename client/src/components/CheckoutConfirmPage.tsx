@@ -11,6 +11,7 @@ import { useCartStore } from "../store/useCartStore";
 import { useRestaurantStore } from "../store/useRestaurantStore";
 import { useOrderStore } from "../store/useOrderStore";
 import { Loader2 } from "lucide-react";
+import type { CartItem } from "@/types/cartType";
 
 
 
@@ -25,8 +26,6 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
         address: user?.address || "",
         city: user?.city || "",
         country: user?.country || "",
-        //self addition
-        // totalAmount: totalAmount || 0,
     });
 
     const { cart } = useCartStore();
@@ -39,36 +38,101 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
         setInput({ ...input, [name]: value });
     };
 
+    // const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
+
+    //     // API Implementation
+    //     try {
+
+    //         console.log("checkoutHandler call in try block after Continue To Payment");
+
+    //         // const checkoutData: CheckoutSessionRequest = {
+    //         //     cartItems: cart.map((cartItem) => ({
+    //         //         // menuId: cartItem.menuId, 
+    //         //         _id: cartItem._id,
+    //         //         name: cartItem.name,
+    //         //         imageUrl: cartItem.imageUrl || "https://example.com/placeholder.png",
+    //         //         price: Number(cartItem.price) || 0,
+    //         //         quantity: Number(cartItem.quantity) || 0,
+    //         //     })),
+    //         //     deliveryDetails: input,
+    //         //     restaurantId: singleRestaurant?._id as string || "",
+    //         //     // totalAmount: totalAmount,
+    //         //     // status: "pending",
+    //         // };
+
+    //         const checkoutData: CheckoutSessionRequest = {
+    //           restaurants: Object.values(
+    //             cart.reduce((acc: any, item) => {
+    //               if (!acc[item._id]) {
+    //                 acc[item._id] = {
+    //                   restaurantId: item._id,
+    //                   cartItems: [],
+    //                 };
+    //               }
+    //               acc[item._id].cartItems.push({
+    //                 menuId: item._id,
+    //                 name: item.name,
+    //                 imageUrl:
+    //                   item.imageUrl || "https://example.com/placeholder.png",
+    //                 price: Number(item.price) || 0,
+    //                 quantity: Number(item.quantity) || 0,
+    //               });
+    //               return acc;
+    //             }, {})
+    //           ),
+    //           deliveryDetails: input,
+    //         };
+
+    //         console.log("checkoutData ready now passing it createCheckoutSession from orderStore ", checkoutData);
+
+    //         await createCheckoutSession(checkoutData);
+
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
+
     const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        // API Implementation
-        try {
+    try {
+      console.log("checkoutHandler: preparing checkoutData...");
 
-            console.log("checkoutHandler call in try block after Continue To Payment");
-
-            const checkoutData: CheckoutSessionRequest = {
-                cartItems: cart.map((cartItem) => ({
-                    // menuId: cartItem.menuId, 
-                    _id: cartItem._id,
-                    name: cartItem.name,
-                    imageUrl: cartItem.imageUrl || "https://example.com/placeholder.png",
-                    price: Number(cartItem.price) || 0,
-                    quantity: Number(cartItem.quantity) || 0,
-                })),
-                deliveryDetails: input,
-                restaurantId: singleRestaurant?._id as string || "",
-                // totalAmount: totalAmount,
-                // status: "pending",
+      // ✅ Group cart by restaurantId
+      const groupedRestaurants = Object.values(
+        // cart.reduce((acc: any, item) => {
+        cart.reduce<Record<string, { restaurantId: string; cartItems: CartItem[] }>>(
+        (acc, item) => {
+          const rId = item._id; // .restaurantId  //restaurantId must exist on cartItem
+          if (!acc[rId]) {
+            acc[rId] = {
+              restaurantId: rId,
+              cartItems: [],
             };
+          }
+          acc[rId].cartItems.push({
+            _id: item._id, // menu item id
+            name: item.name,
+            imageUrl: item.imageUrl || "https://example.com/placeholder.png",
+            price: Number(item.price) || 0,
+            quantity: Number(item.quantity) || 0,
+          });
+          return acc;
+        }, {})
+      );
 
-            console.log("checkoutData ready now passing it createCheckoutSession from orderStore ", checkoutData);
+      const checkoutData: CheckoutSessionRequest = {
+        restaurants: groupedRestaurants,
+        deliveryDetails: input,
+      };
 
-            await createCheckoutSession(checkoutData);
+      console.log("checkoutData ready:", checkoutData);
 
-        } catch (error) {
-            console.log(error);
-        }
+      await createCheckoutSession(checkoutData);
+    } catch (error) {
+      console.error("checkoutHandler error:", error);
+    }
     };
 
     return (

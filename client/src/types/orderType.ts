@@ -1,7 +1,11 @@
+import type { CartItem } from "./cartType";
+
+
 // export type CheckoutSessionRequest = {
 
 //     cartItems:{
-//         menuId:string;
+//         // menuId: string;
+//         _id: string;
 //         name:string;
 //         imageUrl:string;
 //         // price:string;
@@ -13,38 +17,64 @@
 //     deliveryDetails:{
 //         name:string;
 //         email:string;
-//         contact:string;
+//         // contact:string;
 //         address:string;
 //         city:string;
 //         country:string;
-//         // self addtion
-//         totalAmount: number;
+//         // totalAmount: number;
 //     },
 
 //     restaurantId:string;
 // };
 
-export type CheckoutSessionRequest = {
+// export type MenuItem = {
+//     _id: string;
+//     // menuId: string;
+//     name: string;
+//     description?: string;
+//     price: number;
+//     imageUrl: string; //image:
+// };
 
-  cartItems: {
-    // menuId: string;
-    _id: string;
-    name: string;
-    imageUrl: string;
-    price: number;
-    quantity: number;
-  }[];
+// export interface CartItem extends MenuItem { 
+//     quantity: number;
+// };
 
-  deliveryDetails: {
-    email: string;
-    name: string;
-    address: string;
-    city: string;
+// type CartItem = {
+//       menuId: string;   // actual DB menu item _id
+//       name: string;
+//       imageUrl: string;
+//       price: number;
+//       quantity: number;
+//     }[];
+
+// <---------------------------------------After Deploy----------------------------------------------->
+
+
+export type RCSRType = {
+    restaurantId: string;
+    cartItems: CartItem[];
   };
 
-  restaurantId: string;
+export type DDCSRType = {
+    email: string;
+    name: string;
+    contact: string;
+    address: string;
+    city: string;
+    country: string;
+  };  
 
+// RestaurantCheckoutSessionRequest = RCSRType
+// deliveryDetailsCheckoutSessionRequest = DDCSRType 
+
+export type CheckoutSessionRequest = {
+
+  restaurants: RCSRType[];
+  deliveryDetails: DDCSRType;
+  
 };
+
 
 
 export interface Orders extends CheckoutSessionRequest {
