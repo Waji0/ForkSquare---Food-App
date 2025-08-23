@@ -319,7 +319,7 @@ export interface Orders extends CheckoutSessionRequest {
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find({ user: req.user?.id }).populate("user").populate("restaurant");
+    const orders = await Order.find({ user: req.id }).populate("user").populate("restaurant");
     return res.status(200).json({ success: true, orders });
   } catch (error) {
     console.error(error);
@@ -372,7 +372,8 @@ export const getOrders = async (req: Request, res: Response) => {
 export const createCheckoutSession = async (req: Request, res: Response) => {
     try {
 
-        if (!req.user || !req.user.id) {
+      // if (!req.user || !req.user.id) {
+      if (!req.id) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
        }
 
@@ -400,8 +401,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         }
 
         const order: IOrder = new Order({
-            // user: req.id, 
-            user: req.user.id,
+            user: req.id, 
+            // user: req.user.id,
             restaurant: restaurantId,
             deliveryDetails,
             cartItems,

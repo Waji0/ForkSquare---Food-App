@@ -1,24 +1,16 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-// declare global {
-//     namespace Express{
-//         interface Request {
-//             id: string;
-//         }
-//     }
-// }
+
 
 declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        // email?: string;
-      };
+    namespace Express{
+        interface Request {
+            id: string;
+        }
     }
-  }
 }
+
 
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -44,11 +36,10 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
             });
         }
 
-        // req.user.id = decode.userId;
-        req.user = {
-        id: decode.userId,
-        // email: decode.email ?? "", // optional
-        };
+        req.id = decode.userId;
+        // req.user = {
+        // id: decode.userId,
+        // };
 
 
         next();
