@@ -136,7 +136,7 @@ export const deleteMenu = async (req: Request, res: Response) => {
 
     if (restaurant) {
       restaurant.menus = restaurant.menus.filter(
-        (menuId) => menuId.toString() !== id
+        (_id) => _id.toString() !== id
       );
       await restaurant.save();
     }

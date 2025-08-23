@@ -13,8 +13,8 @@ type MenuState = {
     loading: boolean,
     menu: null,
     createMenu: (formData: FormData) => Promise<void>;
-    editMenu: (menuId: string, formData: FormData) => Promise<void>;
-    deleteMenu: (menuId: string) => Promise<void>; //self
+    editMenu: (_id: string, formData: FormData) => Promise<void>;
+    deleteMenu: (_id: string) => Promise<void>; //self
 }
 
 export const useMenuStore = create<MenuState>()(
@@ -45,11 +45,11 @@ export const useMenuStore = create<MenuState>()(
         }
       },
 
-      editMenu: async (menuId: string, formData: FormData) => {
+      editMenu: async (_id: string, formData: FormData) => {
         try {
           set({ loading: true });
           const response = await axios.put(
-            `${API_END_POINT}/${menuId}`,
+            `${API_END_POINT}/${_id}`,
             formData,
             {
               headers: {
@@ -91,17 +91,17 @@ export const useMenuStore = create<MenuState>()(
       //     }
       //   },
 
-      deleteMenu: async (menuId: string) => {
+      deleteMenu: async (_id: string) => {
         try {
           set({ loading: true });
-          const response = await axios.delete(`${API_END_POINT}/${menuId}`);
+          const response = await axios.delete(`${API_END_POINT}/${_id}`);
 
           if (response.data.success) {
             toast.success(response.data.message);
             set({ loading: false });
 
             // ✅ remove from restaurant store
-            useRestaurantStore.getState().removeMenuFromRestaurant(menuId);
+            useRestaurantStore.getState().removeMenuFromRestaurant(_id);
           }
         } catch (error: any) {
           toast.error(error.response?.data?.message || "Something went wrong");

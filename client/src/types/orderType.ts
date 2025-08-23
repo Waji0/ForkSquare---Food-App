@@ -27,7 +27,8 @@
 export type CheckoutSessionRequest = {
 
   cartItems: {
-    menuId: string;
+    // menuId: string;
+    _id: string;
     name: string;
     imageUrl: string;
     price: number;

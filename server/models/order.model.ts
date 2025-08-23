@@ -8,7 +8,8 @@ type DeliveryDetails = {
 }
 
 type CartItems = {
-    menuId: string;
+    // menuId: string;
+    _id: string;
     name: string;
     imageUrl: string; //image:
     price: number;
@@ -46,7 +47,7 @@ const orderSchema = new mongoose.Schema<IOrder>({
 
     cartItems: [
         {
-            menuId: {type:String, required:true},
+            _id: {type:String, required:true},
             name: {type:String, required:true},
             imageUrl: {type:String, required:true}, //image:
             price: {type:Number, required:true},

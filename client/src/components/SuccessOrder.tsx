@@ -19,25 +19,30 @@ const Success = () => {
   if (orders.length === 0)
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <h1 className="font-bold text-2xl text-gray-700 dark:text-gray-300">
+        <h1 className="font-bold text-2xl text-gray-700">
+          {/*  dark:text-gray-300 */}
           Order not found!
         </h1>
       </div>
     );
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 max-w-lg w-full">
-        
+    //  dark:bg-gray-900
+    // dark:bg-gray-800
+    //  dark:text-gray-200
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="bg-white shadow-lg rounded-lg p-6 max-w-lg w-full">
+
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          <h1 className="text-2xl font-bold text-gray-800">
             Order Status:{" "}
             <span className="text-[#FF5A5A]">{"confirm".toUpperCase()}</span>
           </h1>
         </div>
 
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            {/*  dark:text-gray-300 */}
             Order Summary
           </h2>
 
@@ -45,9 +50,22 @@ const Success = () => {
           {orders.map((order: any, index: number) => (
             <div key={index} className="border border-gray-900 p-2 m-2">
 
-              <div className="text-gray-800 dark:text-gray-200 flex items-center">
+              <div className="text-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-800">
+                  {/* dark:text-gray-200 */}
+                  Order Status:{" "}
+                  <span className="text-[#FF5A5A]">
+                    {order.status.toUpperCase()}
+                  </span>
+                </h1>
+              </div>
+
+              <div className="text-gray-800 flex items-center">
+                {/*  dark:text-gray-200 */}
                 <IndianRupee />
-                <span className="text-lg text-gray-950 font-medium">{order.totalAmount}</span>
+                <span className="text-lg text-gray-950 font-medium">
+                  {order.totalAmount}
+                </span>
               </div>
 
               {order.cartItems.map((item: CartItem) => (
@@ -59,12 +77,14 @@ const Success = () => {
                         alt=""
                         className="w-14 h-14 rounded-md object-cover"
                       />
-                      <h3 className="ml-4 text-gray-800 dark:text-gray-200 font-medium">
+                      <h3 className="ml-4 text-gray-800 font-medium">
+                        {/*  dark:text-gray-200 */}
                         {item.name}
                       </h3>
                     </div>
                     <div className="text-right">
-                      <div className="text-gray-800 dark:text-gray-200 flex items-center">
+                      <div className="text-gray-800 flex items-center">
+                        {/*  dark:text-gray-200 */}
                         <IndianRupee />
                         <span className="text-lg font-medium">
                           {item.price * item.quantity}
@@ -77,7 +97,6 @@ const Success = () => {
               ))}
             </div>
           ))}
-
         </div>
 
         <Link to="/cart">
@@ -85,7 +104,6 @@ const Success = () => {
             Continue Shopping
           </Button>
         </Link>
-
       </div>
     </div>
   );

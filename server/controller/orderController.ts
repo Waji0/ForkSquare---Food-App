@@ -278,7 +278,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export type CheckoutSessionRequest = {
 
   cartItems: {
-    menuId: string;
+    _id: string;
     name: string;
     imageUrl: string;
     price: number;
@@ -447,7 +447,7 @@ export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, 
 
     // 1. create line items
     const lineItems = checkoutSessionRequest.cartItems.map((cartItem) => {
-        const menuItem = menuItems.find((item: IMenuDocument) => item._id.toString() === cartItem.menuId);
+        const menuItem = menuItems.find((item: IMenuDocument) => item._id.toString() === cartItem._id);
         if (!menuItem) throw new Error(`Menu item id not found`);
 
         return {

@@ -508,7 +508,7 @@ interface RestaurantStoreState {
   // Menu management
   addMenuToRestaurant: (menu: MenuItem) => void;
   updateMenuToRestaurant: (menu: MenuItem) => void;
-  removeMenuFromRestaurant: (menuId: string) => void;
+  removeMenuFromRestaurant: (_id: string) => void;
 
   // Filters
   setAppliedFilter: (value: string) => void;
@@ -673,13 +673,13 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
         });
       },
 
-      removeMenuFromRestaurant: (menuId) => {
+      removeMenuFromRestaurant: (_id) => {
         set((state) => {
           if (state.restaurant) {
             return {
               restaurant: {
                 ...state.restaurant,
-                menus: state.restaurant.menus.filter((menu) => menu._id !== menuId),
+                menus: state.restaurant.menus.filter((menu) => menu._id !== _id),
               },
             };
           }

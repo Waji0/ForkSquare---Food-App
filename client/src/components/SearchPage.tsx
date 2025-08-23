@@ -341,7 +341,8 @@ export default SearchPage;
 
 // ---------------- RestaurantCard Component ----------------
 const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
-  <Card className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+  //  dark:bg-gray-800
+  <Card className="bg-white shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
     <div className="relative">
       <AspectRatio ratio={16 / 6}>
         <img
@@ -350,23 +351,28 @@ const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
           className="w-full h-full object-cover"
         />
       </AspectRatio>
-      <div className="absolute top-2 left-2 bg-white dark:bg-gray-700 bg-opacity-75 rounded-lg px-3 py-1">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      {/*  dark:bg-gray-700 */}
+      <div className="absolute top-2 left-2 bg-white bg-opacity-75 rounded-lg px-3 py-1">
+        <span className="text-sm font-medium text-gray-700">
+        {/*  dark:text-gray-300 */}
           Featured
         </span>
       </div>
     </div>
     <CardContent className="p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl font-bold text-gray-900">
+        {/*  dark:text-gray-100 */}
         {restaurant.restaurantName}
       </h1>
-      <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
+      <div className="mt-2 gap-1 flex items-center text-gray-600">
+        {/*  dark:text-gray-400 */}
         <MapPin size={16} />
         <p className="text-sm">
           City: <span className="font-medium">{restaurant.city}</span>
         </p>
       </div>
-      <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
+      <div className="mt-2 gap-1 flex items-center text-gray-600">
+        {/*  dark:text-gray-400 */}
         <Globe size={16} />
         <p className="text-sm">
           Country: <span className="font-medium">{restaurant.country}</span>
@@ -380,7 +386,8 @@ const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
         ))}
       </div>
     </CardContent>
-    <CardFooter className="p-4 border-t dark:border-t-gray-700 border-t-gray-100 text-white flex justify-end">
+    <CardFooter className="p-4 border-t border-t-gray-100 text-white flex justify-end">
+      {/*  dark:border-t-gray-700 */}
       <Link to={`/restaurant/${restaurant._id}`}>
         <Button className="bg-orange hover:bg-hoverOrange font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
           View Menus
