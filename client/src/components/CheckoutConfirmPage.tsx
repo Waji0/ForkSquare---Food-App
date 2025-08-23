@@ -30,8 +30,8 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     });
 
     const { cart } = useCartStore();
-    const { restaurant } = useRestaurantStore();
-    console.log("restaurantStore", restaurant);
+    const { restaurant, singleRestaurant } = useRestaurantStore();
+    console.log("singleRestaurant from restaurantStore", singleRestaurant);
     const { createCheckoutSession, loading } = useOrderStore();
 
     const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {

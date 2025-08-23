@@ -13,8 +13,9 @@ const RestaurantDetail = () => {
   const { singleRestaurant, getSingleRestaurant } = useRestaurantStore();
 
   useEffect(() => {
-    getSingleRestaurant(params.id!); 
     
+    getSingleRestaurant(params.id!); 
+
   }, [params.id]);
 
   return (
