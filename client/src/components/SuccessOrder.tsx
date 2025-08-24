@@ -1,4 +1,3 @@
-import { IndianRupee } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -177,12 +176,6 @@ const Success = () => {
                   {order.status?.toUpperCase()}
                 </span>
               </h2>
-              <div className="text-gray-800 flex items-center justify-center mt-2">
-                <IndianRupee />
-                <span className="ml-1 font-medium">
-                  {order.totalAmount ?? 0}
-                </span>
-              </div>
             </div>
 
             {order.restaurants?.map((restaurant: any) => (
@@ -208,7 +201,6 @@ const Success = () => {
                         </h4>
                       </div>
                       <div className="text-gray-800 flex items-center">
-                        <IndianRupee />
                         <span className="ml-1 font-medium">
                           {item.price * item.quantity}
                         </span>
@@ -218,13 +210,17 @@ const Success = () => {
                   </div>
                 ))}
 
-                {/* <div className="text-right font-semibold text-gray-700">
-                  Restaurant Total: <IndianRupee className="inline-block" />
-                  {restaurant.totalAmount ?? 0}
-                </div> */}
-                
+                <div className="text-gray-800 flex p-2 items-center justify-between mt-2">
+                  <span className="ml-1 font-medium text-bold">
+                    Total Amount:
+                  </span>
+                  <span className="ml-1 font-medium text-bold">
+                    {order.totalAmount ?? 0}
+                  </span>
+                </div>
               </div>
             ))}
+            
           </div>
         ))}
 
