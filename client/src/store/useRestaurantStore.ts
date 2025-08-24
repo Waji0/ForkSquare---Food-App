@@ -646,7 +646,7 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
       // fetch all restaurants
       getAllRestaurants: async () => {
         try {
-          const res = await axios.get("/restaurant/all");
+          const res = await axios.get("/restaurant/all", { withCredentials: true, });
           set({ restaurants: res.data.restaurants });
         } catch (err) {
           console.error("Error fetching all restaurants:", err);

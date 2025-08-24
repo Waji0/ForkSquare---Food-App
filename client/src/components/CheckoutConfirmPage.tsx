@@ -167,65 +167,77 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
 
   // 🔹 Build menuId → restaurantId map
   
-  
-  const menuRestaurantMap: Record<string, string> = {};
-  restaurants.forEach((r: any) => {
-    r.menus.forEach((m: any) => {
-      menuRestaurantMap[m._id] = r._id;
-    });
-  });
+    const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-  const findRestaurantIdByMenuId = (menuId: string): string => {
-    const rId = menuRestaurantMap[menuId];
-    if (!rId) {
-      throw new Error(`No restaurant found for menuId: ${menuId}`);
-    }
-    return rId;
-  };
+      try {
+        console.log("checkoutHandler: preparing checkoutData...");
+        console.log("cart items:", cart);
 
-  const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+        // ✅ Make sure restaurants are loaded
+        if (!restaurants.length) {
+          console.warn("No restaurants loaded yet, fetching...");
+          await getAllRestaurants();
+        }
 
-    try {
-      console.log("checkoutHandler: preparing checkoutData...");
-
-      // ✅ Group cart items by restaurant
-      const groupedRestaurants = Object.values( // RestaurantCart
-        cart.reduce<Record<string, RCSRType>>((acc, cartItem) => {
-          const rId = findRestaurantIdByMenuId(cartItem.menuId);
-
-          if (!acc[rId]) {
-            acc[rId] = {
-              restaurantId: rId,
-              cartItems: [],
-            };
-          }
-
-          acc[rId].cartItems.push({
-            menuId: cartItem.menuId, // <--- menuId in cartItem
-            name: cartItem.name,
-            imageUrl: cartItem.imageUrl || "https://example.com/placeholder.png",
-            price: Number(cartItem.price) || 0,
-            quantity: Number(cartItem.quantity) || 0,
+        // ✅ Build menuId → restaurantId map
+        const menuRestaurantMap: Record<string, string> = {};
+        restaurants.forEach((r) => {
+          r.menus.forEach((m) => {
+            menuRestaurantMap[m._id] = r._id;
           });
+        });
 
-          return acc;
-        }, {})
-      );
+        console.log("menuRestaurantMap:", menuRestaurantMap);
 
-      // ✅ Build checkout payload
-      const checkoutData: CheckoutSessionRequest = {
-        restaurants: groupedRestaurants,
-        deliveryDetails: input,
-      };
+        const findRestaurantIdByMenuId = (menuId: string): string => {
+          const rId = menuRestaurantMap[menuId];
+          if (!rId) {
+            throw new Error(`No restaurant found for menuId: ${menuId}`);
+          }
+          return rId;
+        };
 
-      console.log("checkoutData ready:", checkoutData);
+        // ✅ Group cart items by restaurant
+        const groupedRestaurants = Object.values(
+          cart.reduce<Record<string, RCSRType>>((acc, cartItem) => {
+            if (!cartItem.menuId) {
+              console.error("Cart item missing menuId:", cartItem);
+              throw new Error("Cart item missing menuId");
+            }
 
-      await createCheckoutSession(checkoutData);
-    } catch (error) {
-      console.error("checkoutHandler error:", error);
-    }
-  };
+            const rId = findRestaurantIdByMenuId(cartItem.menuId);
+
+            if (!acc[rId]) {
+              acc[rId] = { restaurantId: rId, cartItems: [] };
+            }
+
+            acc[rId].cartItems.push({
+              menuId: cartItem.menuId,
+              name: cartItem.name,
+              imageUrl:
+                cartItem.imageUrl || "https://example.com/placeholder.png",
+              price: Number(cartItem.price) || 0,
+              quantity: Number(cartItem.quantity) || 0,
+            });
+
+            return acc;
+          }, {})
+        );
+
+        // ✅ Build checkout payload
+        const checkoutData: CheckoutSessionRequest = {
+          restaurants: groupedRestaurants,
+          deliveryDetails: input,
+        };
+
+        console.log("checkoutData ready:", checkoutData);
+
+        await createCheckoutSession(checkoutData);
+      } catch (error) {
+        console.error("checkoutHandler error:", error);
+      }
+    };
 
   useEffect(() => {
     getAllRestaurants();
