@@ -293,7 +293,8 @@ export type CheckoutSessionRequest = {
   restaurants: {
     restaurantId: string;
     cartItems: {
-      _id: string;
+      // _id: string;
+      menuId: string;
       name: string;
       imageUrl: string;
       price: number;
@@ -449,9 +450,9 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       // validate & compute total per restaurant
       const totalAmount = r.cartItems.reduce((sum, cartItem) => {
         const menuItem = restaurant.menus.find(
-          (m: any) => m._id.toString() === cartItem._id
+          (m: any) => m._id.toString() === cartItem.menuId
         );
-        if (!menuItem) throw new Error(`Invalid menu item: ${cartItem._id}`);
+        if (!menuItem) throw new Error(`Invalid menu item: ${cartItem.menuId}`);
         return sum + menuItem.price * cartItem.quantity;
       }, 0);
 
@@ -463,9 +464,9 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       // prepare stripe line items
       const lineItems = r.cartItems.map((cartItem) => {
         const menuItem = restaurant.menus.find(
-          (m: any) => m._id.toString() === cartItem._id
+          (m: any) => m._id.toString() === cartItem.menuId
         );
-        if (!menuItem) throw new Error(`Menu item ${cartItem._id} not found`);
+        if (!menuItem) throw new Error(`Menu item ${cartItem.menuId} not found`);
         return {
           price_data: {
             currency: "inr",
@@ -489,8 +490,18 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     const order = new Order({
       user: req.id,
       restaurants: restaurants.map((r, i) => ({
-        restaurantId: r.restaurantId,
-        cartItems: r.cartItems,
+        restaurant: r.restaurantId,
+        // restaurantId: r.restaurantId,
+        // cartItems: r.cartItems,
+        cartItems: r.cartItems.map((c) => ({
+          // _id: c.menuId,
+          menuId: c.menuId,
+          name: c.name,
+          imageUrl: c.imageUrl,
+          price: c.price,
+          quantity: c.quantity,
+          // restaurantId: r.restaurantId, // optional, can skip
+        })),
         totalAmount: restaurantTotals[i].totalAmount,
       })),
       deliveryDetails,

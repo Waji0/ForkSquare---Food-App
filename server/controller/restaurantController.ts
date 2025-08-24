@@ -343,3 +343,27 @@ export const deleteRestaurant = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+export const getAllRestaurants = async (req: Request, res: Response) => {
+  try {
+    const restaurants = await Restaurant.find().populate("menus");
+
+    if (!restaurants || restaurants.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No restaurants found",
+        restaurants: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: restaurants.length,
+      restaurants,
+    });
+  } catch (error) {
+    console.error("Error fetching all restaurants:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

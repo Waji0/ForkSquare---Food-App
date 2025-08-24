@@ -6,10 +6,19 @@ import { useNavigate } from "react-router-dom";
 
 
 
-const AvailableMenu = ({ menus }: { menus: MenuItem[] }) => {
+const AvailableMenu = ({ menus }: { menus: MenuItem[]}) => {
 
+
+// interface AvailableMenuProps {
+//   selectedRestaurant: Restaurant;
+// }
+
+// const AvailableMenu: React.FC<AvailableMenuProps> = ({ selectedRestaurant }) => {
+ 
   const { addToCart } = useCartStore();
   const navigate = useNavigate();
+
+  // const { menus } = selectedRestaurant;
 
   return (
     <div className="md:p-4">

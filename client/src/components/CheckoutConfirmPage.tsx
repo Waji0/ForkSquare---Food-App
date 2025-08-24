@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter } from "./ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -6,12 +6,12 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useUserStore } from "../store/useUserStore";
-import type { CheckoutSessionRequest } from "../types/orderType";
+import type { CheckoutSessionRequest, RCSRType } from "../types/orderType";
 import { useCartStore } from "../store/useCartStore";
 import { useRestaurantStore } from "../store/useRestaurantStore";
 import { useOrderStore } from "../store/useOrderStore";
 import { Loader2 } from "lucide-react";
-import type { CartItem } from "@/types/cartType";
+// import type { CartItem } from "@/types/cartType";
 
 
 
@@ -29,9 +29,10 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     });
 
     const { cart } = useCartStore();
-    const { singleRestaurant, restaurant } = useRestaurantStore();
+    const { singleRestaurant, restaurant, getAllRestaurants, restaurants } = useRestaurantStore();
     console.log("singleRestaurant & Restaurant from restaurantStore", singleRestaurant, " ",  restaurant);
     const { createCheckoutSession, loading } = useOrderStore();
+    // const { findRestaurantIdByMenuId } = useRestaurantStore();
 
     const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -93,35 +94,126 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     //     }
     // };
 
-    const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
+    // <-------------------------------------------------------------------------------------------------->
+
+    // const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
+    //   e.preventDefault();
+
+    //   try {
+    //     console.log("checkoutHandler: preparing checkoutData...");
+
+    //     // ✅ Group cart items by restaurantId
+    //     // const groupedRestaurants = Object.values(
+    //     //   // cart.reduce((acc: any, item) => {
+    //     //   cart.reduce<Record<string, RCSRType>>((acc, item) => {
+    //     //     const rId = item.restaurantId; // ✅ now explicitly typed
+
+    //     //     if (!acc[rId]) {
+    //     //       acc[rId] = {
+    //     //         restaurantId: rId,
+    //     //         cartItems: [],
+    //     //       };
+    //     //     }
+
+    //     //     acc[rId].cartItems.push({
+    //     //       _id: item._id, // menuId
+    //     //       name: item.name,
+    //     //       imageUrl: item.imageUrl || "https://example.com/placeholder.png",
+    //     //       price: Number(item.price) || 0,
+    //     //       quantity: Number(item.quantity) || 0,
+    //     //       restaurantId: rId, // ✅ keep for frontend but backend won’t use it
+    //     //     });
+
+    //     //     return acc;
+    //     //   }, {})
+    //     // ); // restaurantId in CartItem
+
+    //     const groupedRestaurants = Object.values(
+    //       cart.reduce<Record<string, RestaurantCart>>((acc, item) => {
+    //         const rId = findRestaurantIdByMenuId(item._id); // 🔥 utility to map menuId → restaurantId
+    //         if (!acc[rId]) {
+    //           acc[rId] = {
+    //             restaurantId: rId,
+    //             cartItems: [],
+    //           };
+    //         }
+    //         acc[rId].cartItems.push({
+    //           _id: item._id,
+    //           name: item.name,
+    //           imageUrl: item.imageUrl,
+    //           price: item.price,
+    //           quantity: item.quantity,
+    //         });
+    //         return acc;
+    //       }, {})
+    //     );
+
+
+    //     // ✅ Build checkout payload
+    //     const checkoutData: CheckoutSessionRequest = {
+    //       restaurants: groupedRestaurants,
+    //       deliveryDetails: input, // comes from your form state
+    //     };
+
+    //     console.log("checkoutData ready:", checkoutData);
+
+    //     // ✅ Call backend
+    //     await createCheckoutSession(checkoutData);
+    //   } catch (error) {
+    //     console.error("checkoutHandler error:", error);
+    //   }
+    // };
+
+
+  // 🔹 Build menuId → restaurantId map
+  
+  
+  const menuRestaurantMap: Record<string, string> = {};
+  restaurants.forEach((r: any) => {
+    r.menus.forEach((m: any) => {
+      menuRestaurantMap[m._id] = r._id;
+    });
+  });
+
+  const findRestaurantIdByMenuId = (menuId: string): string => {
+    const rId = menuRestaurantMap[menuId];
+    if (!rId) {
+      throw new Error(`No restaurant found for menuId: ${menuId}`);
+    }
+    return rId;
+  };
+
+  const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       console.log("checkoutHandler: preparing checkoutData...");
 
-      // ✅ Group cart by restaurantId
-      const groupedRestaurants = Object.values(
-        // cart.reduce((acc: any, item) => {
-        cart.reduce<Record<string, { restaurantId: string; cartItems: CartItem[] }>>(
-        (acc, item) => {
-          const rId = item._id; // .restaurantId  //restaurantId must exist on cartItem
+      // ✅ Group cart items by restaurant
+      const groupedRestaurants = Object.values( // RestaurantCart
+        cart.reduce<Record<string, RCSRType>>((acc, cartItem) => {
+          const rId = findRestaurantIdByMenuId(cartItem.menuId);
+
           if (!acc[rId]) {
             acc[rId] = {
               restaurantId: rId,
               cartItems: [],
             };
           }
+
           acc[rId].cartItems.push({
-            _id: item._id, // menu item id
-            name: item.name,
-            imageUrl: item.imageUrl || "https://example.com/placeholder.png",
-            price: Number(item.price) || 0,
-            quantity: Number(item.quantity) || 0,
+            menuId: cartItem.menuId, // <--- menuId in cartItem
+            name: cartItem.name,
+            imageUrl: cartItem.imageUrl || "https://example.com/placeholder.png",
+            price: Number(cartItem.price) || 0,
+            quantity: Number(cartItem.quantity) || 0,
           });
+
           return acc;
         }, {})
       );
 
+      // ✅ Build checkout payload
       const checkoutData: CheckoutSessionRequest = {
         restaurants: groupedRestaurants,
         deliveryDetails: input,
@@ -133,7 +225,12 @@ const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispat
     } catch (error) {
       console.error("checkoutHandler error:", error);
     }
-    };
+  };
+
+  useEffect(() => {
+    getAllRestaurants();
+  }, [getAllRestaurants]);
+
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

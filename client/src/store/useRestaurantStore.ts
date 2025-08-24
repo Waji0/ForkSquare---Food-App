@@ -482,6 +482,7 @@ axios.defaults.baseURL = "https://forksquare-server.vercel.app/api/v1";
 interface RestaurantStoreState {
   loading: boolean;
   restaurant: Restaurant | null;
+  restaurants: Restaurant[];
   searchedRestaurant: { data: Restaurant[] };
   appliedFilter: string[];
   singleRestaurant: Restaurant | null;
@@ -500,6 +501,7 @@ interface RestaurantStoreState {
   ) => Promise<void>;
 
   getSingleRestaurant: (restaurantId: string) => Promise<void>;
+  getAllRestaurants: () => Promise<void>;
 
   // Orders
   getRestaurantOrders: () => Promise<void>;
@@ -509,6 +511,9 @@ interface RestaurantStoreState {
   addMenuToRestaurant: (menu: MenuItem) => void;
   updateMenuToRestaurant: (menu: MenuItem) => void;
   removeMenuFromRestaurant: (_id: string) => void;
+
+  // 
+  // findRestaurantIdByMenuId: (menuId: string) => string | null;
 
   // Filters
   setAppliedFilter: (value: string) => void;
@@ -523,6 +528,7 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
     (set, get) => ({
       loading: false,
       restaurant: null,
+      restaurants: [],
       searchedRestaurant: { data: [] },
       appliedFilter: [],
       singleRestaurant: null,
@@ -547,7 +553,9 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
           });
           if (data.success) toast.success(data.message);
         } catch (err: any) {
-          toast.error(err.response?.data?.message || "Failed to create restaurant");
+          toast.error(
+            err.response?.data?.message || "Failed to create restaurant"
+          );
         } finally {
           set({ loading: false });
         }
@@ -560,7 +568,9 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
           const { data } = await axios.get("/restaurant/");
           if (data.success) set({ restaurant: data.restaurant });
         } catch (err: any) {
-          toast.error(err.response?.data?.message || "Failed to fetch restaurant");
+          toast.error(
+            err.response?.data?.message || "Failed to fetch restaurant"
+          );
         } finally {
           set({ loading: false });
         }
@@ -573,7 +583,8 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
           const { data } = await axios.put("/restaurant/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-          if (data.success) toast.success(data.message || "Restaurant updated!");
+          if (data.success)
+            toast.success(data.message || "Restaurant updated!");
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Update failed");
         } finally {
@@ -586,7 +597,11 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
         try {
           const { data } = await axios.delete("/restaurant/");
           if (data.success) toast.success(data.message || "Restaurant deleted");
-          set({ restaurant: null, restaurantOrder: [], singleRestaurant: null });
+          set({
+            restaurant: null,
+            restaurantOrder: [],
+            singleRestaurant: null,
+          });
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Delete failed");
         }
@@ -602,13 +617,12 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
           const { data } = await axios.get(
             `/restaurant/search/${searchText}?${params.toString()}`
           );
-          
+
           if (data.success) {
             set({ searchedRestaurant: { data: data.data } });
           } else {
-             set({ searchedRestaurant: { data: [] } });
+            set({ searchedRestaurant: { data: [] } });
           }
-
         } catch (err: any) {
           toast.error(err.response?.data?.message || "Search failed");
           set({ searchedRestaurant: { data: [] } });
@@ -623,7 +637,19 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
           const { data } = await axios.get(`/restaurant/${restaurantId}`);
           if (data.success) set({ singleRestaurant: data.restaurant });
         } catch (err: any) {
-          toast.error(err.response?.data?.message || "Failed to fetch restaurant");
+          toast.error(
+            err.response?.data?.message || "Failed to fetch restaurant"
+          );
+        }
+      },
+
+      // fetch all restaurants
+      getAllRestaurants: async () => {
+        try {
+          const res = await axios.get("/restaurant/all");
+          set({ restaurants: res.data.restaurants });
+        } catch (err) {
+          console.error("Error fetching all restaurants:", err);
         }
       },
 
@@ -640,7 +666,10 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
       updateRestaurantOrder: async (orderId, status) => {
         await get().ensureAuthenticated();
         try {
-          const { data } = await axios.put(`/restaurant/order/${orderId}/status`, { status });
+          const { data } = await axios.put(
+            `/restaurant/order/${orderId}/status`,
+            { status }
+          );
           if (data.success) {
             const updatedOrder = get().restaurantOrder.map((order) =>
               order._id === orderId ? { ...order, status: data.status } : order
@@ -667,7 +696,9 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
             const updatedMenuList = state.restaurant.menus.map((menu) =>
               menu._id === updatedMenu._id ? updatedMenu : menu
             );
-            return { restaurant: { ...state.restaurant, menus: updatedMenuList } };
+            return {
+              restaurant: { ...state.restaurant, menus: updatedMenuList },
+            };
           }
           return state;
         });
@@ -679,13 +710,42 @@ export const useRestaurantStore = create<RestaurantStoreState>()(
             return {
               restaurant: {
                 ...state.restaurant,
-                menus: state.restaurant.menus.filter((menu) => menu._id !== _id),
+                menus: state.restaurant.menus.filter(
+                  (menu) => menu._id !== _id
+                ),
               },
             };
           }
           return state;
         });
       },
+
+      // findRestaurantIdByMenuId: (menuId: string): string | null => {
+      //   const { restaurant, singleRestaurant, searchedRestaurant } = get();
+
+      //   // ✅ 1. Check singleRestaurant first (when ordering from a restaurant page)
+      //   if (singleRestaurant?.menus) {
+      //     const found = singleRestaurant.menus.find(
+      //       (menu) => menu._id === menuId
+      //     );
+      //     if (found) return singleRestaurant._id;
+      //   }
+
+      //   // ✅ 2. Check the logged-in restaurant (for restaurant owner flow)
+      //   if (restaurant?.menus) {
+      //     const found = restaurant.menus.find((menu) => menu._id === menuId);
+      //     if (found) return restaurant._id;
+      //   }
+
+      //   // ✅ 3. Check searchedRestaurant (when coming from search results)
+      //   for (const rest of searchedRestaurant?.data || []) {
+      //     const found = rest.menus.find((menu) => menu._id === menuId);
+      //     if (found) return rest._id;
+      //   }
+
+      //   // ❌ Not found
+      //   return null;
+      // },
 
       setAppliedFilter: (value) => {
         set((state) => {
