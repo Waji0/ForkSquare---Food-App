@@ -20,7 +20,8 @@ const Orders = () => {
   return (
     <div className="max-w-6xl mx-auto py-10 px-6">
 
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-10">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-10">
+        {/*  dark:text-white */}
         Orders Overview
       </h1>
 
@@ -30,21 +31,24 @@ const Orders = () => {
         {restaurantOrder.map((order: Order) => (
           <div key={order._id} className="flex flex-col md:flex-row justify-between items-start sm:items-center bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
             <div className="flex-1 mb-6 sm:mb-0">
-              <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <h1 className="text-xl font-semibold text-gray-800 ">
+                {/* dark:text-gray-100 */}
                 {order.deliveryDetails.name}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-gray-600 mt-2">
+                {/* dark:text-gray-400 */}
                 <span className="font-semibold">Address: </span>
                 {order.deliveryDetails.address}
               </p>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-gray-600 mt-2">
                 <span className="font-semibold">Total Amount: </span>
                 {/* {order.totalAmount / 100} */}
                 {order.totalAmount}
               </p>
             </div>
             <div className="w-full sm:w-1/3">
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray300 mb-2">
+              <Label className="block text-sm font-medium text-gray-700 mb-2">
+                {/*  dark:text-gray300 */}
                 Order Status
               </Label>
               <Select

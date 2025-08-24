@@ -218,10 +218,11 @@ const Success = () => {
                   </div>
                 ))}
 
-                <div className="text-right font-semibold text-gray-700">
+                {/* <div className="text-right font-semibold text-gray-700">
                   Restaurant Total: <IndianRupee className="inline-block" />
                   {restaurant.totalAmount ?? 0}
-                </div>
+                </div> */}
+                
               </div>
             ))}
           </div>
