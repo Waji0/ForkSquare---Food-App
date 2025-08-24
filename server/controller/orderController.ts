@@ -276,16 +276,22 @@ import { IMenuDocument } from "../models/menu.model";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 
-
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find({ user: req.id }).populate("user").populate("restaurant");
+    const orders = await Order.find({ user: req.id })
+      .populate("user") // populate user details
+      .populate({
+        path: "restaurants.restaurant", // populate restaurant in the nested array
+        model: "Restaurant",
+      });
+
     return res.status(200).json({ success: true, orders });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 // types/order.ts
 export type CheckoutSessionRequest = {
