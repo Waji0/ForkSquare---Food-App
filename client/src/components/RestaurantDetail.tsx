@@ -10,12 +10,12 @@ import { useParams } from "react-router-dom";
 const RestaurantDetail = () => {
 
   const params = useParams();
-  const { singleRestaurant, getSingleRestaurant, getRestaurant, restaurant } = useRestaurantStore();
+  const { singleRestaurant, getSingleRestaurant } = useRestaurantStore(); // , getRestaurant, restaurant
 
   useEffect(() => {
     
     getSingleRestaurant(params.id!);
-    getRestaurant(); //
+    // getRestaurant(); //
 
   }, [params.id]);
 
@@ -53,7 +53,8 @@ const RestaurantDetail = () => {
       //  <AvailableMenu menus = {singleRestaurant?.menus!}/>
       //  <AvailableMenu menus={restaurant.menus} restaurantId={restaurant._id} />
         } */}
-        {restaurant && <AvailableMenu menus = {restaurant.menus} />} 
+        {/* {restaurant && <AvailableMenu menus = {restaurant.menus} />}  */}
+        {singleRestaurant && <AvailableMenu menus = {singleRestaurant.menus} />} 
       </div>
     </div>
   );
