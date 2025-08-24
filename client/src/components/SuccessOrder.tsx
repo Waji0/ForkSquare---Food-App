@@ -210,18 +210,19 @@ const Success = () => {
                   </div>
                 ))}
 
-                <div className="text-gray-800 flex p-2 items-center justify-between mt-2">
-                  <span className="ml-1 font-medium text-bold">
-                    Total Amount:
-                  </span>
-                  <span className="ml-1 font-medium text-bold">
-                    {order.totalAmount ?? 0}
-                  </span>
-                </div>
               </div>
             ))}
-            
-          </div>
+
+           <div className="text-gray-800 flex p-2 items-center justify-between mt-2">
+              <span className="ml-1 font-medium text-bold">
+               Total Amount:
+              </span>
+              <span className="ml-1 font-medium text-bold">
+                {order.totalAmount ?? 0}
+              </span>
+            </div>
+
+           </div>
         ))}
 
         <Link to="/cart">
